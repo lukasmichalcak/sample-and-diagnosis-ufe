@@ -28,6 +28,18 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - name: Install dependencies
+      run: npm ci
+      env:
+        # 1. This prevents the 40-minute hang during the install phase
+        PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+    - name: Build project
+      run: npm run build --if-present
+
+    - name: Run tests
+      run: npm test
+      env:
+        # 2. This tells Stencil/Puppeteer: "Don't look for the downloaded 
+        # browser, use the Chrome that is already installed on Ubuntu"
+        PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
