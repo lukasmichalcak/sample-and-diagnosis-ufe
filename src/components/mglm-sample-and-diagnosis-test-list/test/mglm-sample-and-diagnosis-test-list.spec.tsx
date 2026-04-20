@@ -7,12 +7,10 @@ describe('mglm-sample-and-diagnosis-test-list', () => {
       components: [MglmSampleAndDiagnosisTestList],
       html: `<mglm-sample-and-diagnosis-test-list></mglm-sample-and-diagnosis-test-list>`,
     });
-    expect(page.root).toEqualHtml(`
-      <mglm-sample-and-diagnosis-test-list>
-        <mock:shadow-root>
-          <slot></slot>
-        </mock:shadow-root>
-      </mglm-sample-and-diagnosis-test-list>
-    `);
+    const wlList = page.rootInstance as MglmSampleAndDiagnosisTestList;
+    const expectedPatients = wlList?.waitingPatients?.length
+
+    const items = page.root.shadowRoot.querySelectorAll("md-list-item");
+    expect(items.length).toEqual(expectedPatients);
   });
 });
