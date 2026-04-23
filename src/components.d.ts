@@ -6,6 +6,15 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface MglmSampleAndDiagnosisTestApp {
+        /**
+          * @default ""
+         */
+        "basePath": string;
+    }
+    interface MglmSampleAndDiagnosisTestEditor {
+        "entryId": string;
+    }
     interface MglmSampleAndDiagnosisTestList {
     }
     interface MyComponent {
@@ -23,8 +32,50 @@ export namespace Components {
         "middle"?: string;
     }
 }
+export interface MglmSampleAndDiagnosisTestEditorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMglmSampleAndDiagnosisTestEditorElement;
+}
+export interface MglmSampleAndDiagnosisTestListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMglmSampleAndDiagnosisTestListElement;
+}
 declare global {
+    interface HTMLMglmSampleAndDiagnosisTestAppElement extends Components.MglmSampleAndDiagnosisTestApp, HTMLStencilElement {
+    }
+    var HTMLMglmSampleAndDiagnosisTestAppElement: {
+        prototype: HTMLMglmSampleAndDiagnosisTestAppElement;
+        new (): HTMLMglmSampleAndDiagnosisTestAppElement;
+    };
+    interface HTMLMglmSampleAndDiagnosisTestEditorElementEventMap {
+        "editor-closed": string;
+    }
+    interface HTMLMglmSampleAndDiagnosisTestEditorElement extends Components.MglmSampleAndDiagnosisTestEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMglmSampleAndDiagnosisTestEditorElementEventMap>(type: K, listener: (this: HTMLMglmSampleAndDiagnosisTestEditorElement, ev: MglmSampleAndDiagnosisTestEditorCustomEvent<HTMLMglmSampleAndDiagnosisTestEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMglmSampleAndDiagnosisTestEditorElementEventMap>(type: K, listener: (this: HTMLMglmSampleAndDiagnosisTestEditorElement, ev: MglmSampleAndDiagnosisTestEditorCustomEvent<HTMLMglmSampleAndDiagnosisTestEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMglmSampleAndDiagnosisTestEditorElement: {
+        prototype: HTMLMglmSampleAndDiagnosisTestEditorElement;
+        new (): HTMLMglmSampleAndDiagnosisTestEditorElement;
+    };
+    interface HTMLMglmSampleAndDiagnosisTestListElementEventMap {
+        "entry-clicked": string;
+    }
     interface HTMLMglmSampleAndDiagnosisTestListElement extends Components.MglmSampleAndDiagnosisTestList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMglmSampleAndDiagnosisTestListElementEventMap>(type: K, listener: (this: HTMLMglmSampleAndDiagnosisTestListElement, ev: MglmSampleAndDiagnosisTestListCustomEvent<HTMLMglmSampleAndDiagnosisTestListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMglmSampleAndDiagnosisTestListElementEventMap>(type: K, listener: (this: HTMLMglmSampleAndDiagnosisTestListElement, ev: MglmSampleAndDiagnosisTestListCustomEvent<HTMLMglmSampleAndDiagnosisTestListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLMglmSampleAndDiagnosisTestListElement: {
         prototype: HTMLMglmSampleAndDiagnosisTestListElement;
@@ -37,12 +88,25 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "mglm-sample-and-diagnosis-test-app": HTMLMglmSampleAndDiagnosisTestAppElement;
+        "mglm-sample-and-diagnosis-test-editor": HTMLMglmSampleAndDiagnosisTestEditorElement;
         "mglm-sample-and-diagnosis-test-list": HTMLMglmSampleAndDiagnosisTestListElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface MglmSampleAndDiagnosisTestApp {
+        /**
+          * @default ""
+         */
+        "basePath"?: string;
+    }
+    interface MglmSampleAndDiagnosisTestEditor {
+        "entryId"?: string;
+        "onEditor-closed"?: (event: MglmSampleAndDiagnosisTestEditorCustomEvent<string>) => void;
+    }
     interface MglmSampleAndDiagnosisTestList {
+        "onEntry-clicked"?: (event: MglmSampleAndDiagnosisTestListCustomEvent<string>) => void;
     }
     interface MyComponent {
         /**
@@ -59,6 +123,12 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
 
+    interface MglmSampleAndDiagnosisTestAppAttributes {
+        "basePath": string;
+    }
+    interface MglmSampleAndDiagnosisTestEditorAttributes {
+        "entryId": string;
+    }
     interface MyComponentAttributes {
         "first": string;
         "middle": string;
@@ -66,6 +136,8 @@ declare namespace LocalJSX {
     }
 
     interface IntrinsicElements {
+        "mglm-sample-and-diagnosis-test-app": Omit<MglmSampleAndDiagnosisTestApp, keyof MglmSampleAndDiagnosisTestAppAttributes> & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes]?: MglmSampleAndDiagnosisTestApp[K] } & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestAppAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestApp[K] };
+        "mglm-sample-and-diagnosis-test-editor": Omit<MglmSampleAndDiagnosisTestEditor, keyof MglmSampleAndDiagnosisTestEditorAttributes> & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes]?: MglmSampleAndDiagnosisTestEditor[K] } & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestEditorAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestEditor[K] };
         "mglm-sample-and-diagnosis-test-list": MglmSampleAndDiagnosisTestList;
         "my-component": Omit<MyComponent, keyof MyComponentAttributes> & { [K in keyof MyComponent & keyof MyComponentAttributes]?: MyComponent[K] } & { [K in keyof MyComponent & keyof MyComponentAttributes as `attr:${K}`]?: MyComponentAttributes[K] } & { [K in keyof MyComponent & keyof MyComponentAttributes as `prop:${K}`]?: MyComponent[K] };
     }
@@ -74,6 +146,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "mglm-sample-and-diagnosis-test-app": LocalJSX.IntrinsicElements["mglm-sample-and-diagnosis-test-app"] & JSXBase.HTMLAttributes<HTMLMglmSampleAndDiagnosisTestAppElement>;
+            "mglm-sample-and-diagnosis-test-editor": LocalJSX.IntrinsicElements["mglm-sample-and-diagnosis-test-editor"] & JSXBase.HTMLAttributes<HTMLMglmSampleAndDiagnosisTestEditorElement>;
             "mglm-sample-and-diagnosis-test-list": LocalJSX.IntrinsicElements["mglm-sample-and-diagnosis-test-list"] & JSXBase.HTMLAttributes<HTMLMglmSampleAndDiagnosisTestListElement>;
             "my-component": LocalJSX.IntrinsicElements["my-component"] & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
