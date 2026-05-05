@@ -15,7 +15,9 @@ export namespace Components {
         "sampleAndDiagnosisId": string;
     }
     interface MglmSampleAndDiagnosisTestEditor {
+        "apiBase": string;
         "entryId": string;
+        "sampleAndDiagnosisId": string;
     }
     interface MglmSampleAndDiagnosisTestList {
         "apiBase": string;
@@ -108,8 +110,10 @@ declare namespace LocalJSX {
         "sampleAndDiagnosisId"?: string;
     }
     interface MglmSampleAndDiagnosisTestEditor {
+        "apiBase"?: string;
         "entryId"?: string;
         "onEditor-closed"?: (event: MglmSampleAndDiagnosisTestEditorCustomEvent<string>) => void;
+        "sampleAndDiagnosisId"?: string;
     }
     interface MglmSampleAndDiagnosisTestList {
         "apiBase"?: string;
@@ -138,6 +142,8 @@ declare namespace LocalJSX {
     }
     interface MglmSampleAndDiagnosisTestEditorAttributes {
         "entryId": string;
+        "sampleAndDiagnosisId": string;
+        "apiBase": string;
     }
     interface MglmSampleAndDiagnosisTestListAttributes {
         "apiBase": string;

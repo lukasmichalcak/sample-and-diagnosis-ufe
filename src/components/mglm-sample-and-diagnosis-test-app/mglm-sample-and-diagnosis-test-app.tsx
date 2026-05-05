@@ -54,6 +54,7 @@ export class MglmSampleAndDiagnosisTestApp {
       <Host>
         { element === "editor"
         ? <mglm-sample-and-diagnosis-test-editor entry-id={entryId}
+          sample-and-diagnosis-id={this.sampleAndDiagnosisId} api-base={this.apiBase}
             oneditor-closed={ () => navigate("./list")} >
           </mglm-sample-and-diagnosis-test-editor>
         : <mglm-sample-and-diagnosis-test-list sample-and-diagnosis-id={this.sampleAndDiagnosisId} api-base={this.apiBase}

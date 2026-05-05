@@ -39,7 +39,7 @@ describe('mglm-sample-and-diagnosis-test-list', () => {
       html: `<mglm-sample-and-diagnosis-test-list sample-and-diagnosis-id="test-ambulance", api-base="http://test/api"></mglm-sample-and-diagnosis-test-list>`,
     });
     const wlList = page.rootInstance as MglmSampleAndDiagnosisTestList;
-    const expectedPatients = wlList?.waitingPatients?.length
+    const expectedPatients = wlList?.testPatients?.length
 
     // Wait for the DOM to update
     await page.waitForChanges();
@@ -62,7 +62,7 @@ describe('mglm-sample-and-diagnosis-test-list', () => {
     });
 
     const wlList = page.rootInstance as MglmSampleAndDiagnosisTestList;
-    const expectedPatients = wlList?.waitingPatients?.length;
+    const expectedPatients = wlList?.testPatients?.length;
 
     // Wait for the DOM to update
     await page.waitForChanges();

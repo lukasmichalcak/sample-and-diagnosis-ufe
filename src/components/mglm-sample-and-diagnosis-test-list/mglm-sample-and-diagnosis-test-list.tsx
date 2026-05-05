@@ -13,9 +13,9 @@ export class MglmSampleAndDiagnosisTestList {
   @State() errorMessage: string;
 
   // TODO might change later
-  waitingPatients: TestListEntry[];
+  testPatients: TestListEntry[];
 
-  private async getWaitingPatientsAsync(): Promise<TestListEntry[]>{
+  private async getTestPatientsAsync(): Promise<TestListEntry[]>{
     // be prepared for connectivitiy issues
     try {
       const configuration = new Configuration({
@@ -36,7 +36,7 @@ export class MglmSampleAndDiagnosisTestList {
   }
 
   async componentWillLoad() {
-    this.waitingPatients = await this.getWaitingPatientsAsync();
+    this.testPatients = await this.getTestPatientsAsync();
   }
   // TODO might change later
 
@@ -47,7 +47,7 @@ export class MglmSampleAndDiagnosisTestList {
           ? <div class="error">{this.errorMessage}</div>
           :
         <md-list>
-          {this.waitingPatients.map(patient =>
+          {this.testPatients.map(patient =>
             <md-list-item onClick={ () => this.entryClicked.emit(patient.id)}>
               <div slot="headline">{patient.name}</div>
               <div slot="supporting-text">{"Predpokladaný vstup: " + patient.estimatedStart?.toLocaleString()}</div>
@@ -56,6 +56,10 @@ export class MglmSampleAndDiagnosisTestList {
           )}
         </md-list>
         }
+        <md-filled-icon-button class="add-button"
+          onclick={() => this.entryClicked.emit("@new")}>
+          <md-icon>add</md-icon>
+        </md-filled-icon-button>
       </Host>
     );
   }

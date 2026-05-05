@@ -14,6 +14,8 @@ info:
 tags:
 - name: sampleAndDiagnosisTestList
   description: Sample And Diagnosis Test List API
+- name: sampleAndDiagnosisConditions
+  description: Patient conditions and symptoms handled in the sample and diagnosis
 paths:
   "/test-list/{sampleAndDiagnosisId}/entries":
     get:
@@ -43,6 +45,184 @@ paths:
                   $ref: "#/components/examples/TestListEntriesExample"
         "404":
           description: Sample and diagnosis with such ID does not exist
+
+    post:
+      tags:
+        - sampleAndDiagnosisTestList
+      summary: Saves new entry into test list
+      operationId: createTestListEntry
+      description: Use this method to store new entry into the test list.
+      parameters:
+        - in: path
+          name: sampleAndDiagnosisId
+          description: pass the id of the particular sample and diagnosis
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestListEntry"
+            examples:
+              request-sample:
+                $ref: "#/components/examples/TestListEntryExample"
+        description: Test list entry to store
+        required: true
+      responses:
+        "200":
+          description: >-
+            Value of the test list entry with re-computed estimated time of
+            sample and diagnosis entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestListEntry"
+              examples:
+                updated-response:
+                  $ref: "#/components/examples/TestListEntryExample"
+        "400":
+          description: Missing mandatory properties of input object.
+        "404":
+          description: Sample and diagnosis with such ID does not exists
+        "409":
+          description: Entry with the specified id already exists
+
+  "/test-list/{sampleAndDiagnosisId}/entries/{entryId}":
+    get:
+      tags:
+        - sampleAndDiagnosisTestList
+      summary: Provides details about test list entry
+      operationId: getTestListEntry
+      description: >-
+        By using sampleAndDiagnosisId and entryId you can details of particular entry
+        item sample and diagnosis.
+      parameters:
+        - in: path
+          name: sampleAndDiagnosisId
+          description: pass the id of the particular sample and diagnosis
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the test list
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: value of the test list entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestListEntry"
+              examples:
+                response:
+                  $ref: "#/components/examples/TestListEntryExample"
+        "404":
+          description: Sample and Diagnosis or Entry with such ID does not exists
+    put:
+      tags:
+        - sampleAndDiagnosisTestList
+      summary: Updates specific entry
+      operationId: updateTestListEntry
+      description: Use this method to update content of the test list entry.
+      parameters:
+        - in: path
+          name: sampleAndDiagnosisId
+          description: pass the id of the particular ambulance
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the test list
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestListEntry"
+            examples:
+              request:
+                $ref: "#/components/examples/TestListEntryExample"
+        description: Test list entry to update
+        required: true
+      responses:
+        "200":
+          description: >-
+            value of the test list entry with re-computed estimated time of
+            sample and diagnosis entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestListEntry"
+              examples:
+                response:
+                  $ref: "#/components/examples/TestListEntryExample"
+        "403":
+          description: >-
+            Value of the entryID and the data id is mismatching. Details are
+            provided in the response body.
+        "404":
+          description: Sample and Diagnosis or Entry with such ID does not exists
+    delete:
+      tags:
+        - sampleAndDiagnosisTestList
+      summary: Deletes specific entry
+      operationId: deleteTestListEntry
+      description: Use this method to delete the specific entry from the test list.
+      parameters:
+        - in: path
+          name: sampleAndDiagnosisId
+          description: pass the id of the particular sample and diagnosis
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the test list
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Item deleted
+        "404":
+          description: Sample and Diagnosis or Entry with such ID does not exists
+
+  "/test-list/{sampleAndDiagnosisId}/condition":
+    get:
+      tags:
+        - sampleAndDiagnosisConditions
+      summary: Provides the list of conditions associated with sample and diagnosis
+      operationId: getConditions
+      description: By using sampleAndDiagnosisId you get list of predefined conditions
+      parameters:
+        - in: path
+          name: sampleAndDiagnosisId
+          description: pass the id of the particular sample and diagnosis
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: value of the predefined conditions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Condition"
+              examples:
+                response:
+                  $ref: "#/components/examples/ConditionsTestExample"
+        "404":
+          description: Ambulance with such ID does not exists
+
 components:
   schemas:
     TestListEntry:
@@ -154,3 +334,26 @@ components:
           value: Nevoľnosť
           code: nausea
           reference: "https://zdravoteka.sk/priznaky/nevolnost/"
+
+    ConditionsTestExample:
+      summary: Sample of GP sample and diagnosis conditions
+      description: |
+        Example list of possible conditions, symptoms, and visit reasons
+      value:
+        - value: Teploty
+          code: subfebrilia
+          reference: "https://zdravoteka.sk/priznaky/zvysena-telesna-teplota/"
+          typicalDurationMinutes: 20
+        - value: Nevoľnosť
+          code: nausea
+          reference: "https://zdravoteka.sk/priznaky/nevolnost/"
+          typicalDurationMinutes: 45
+        - value: Kontrola
+          code: followup
+          typicalDurationMinutes: 15
+        - value: Administratívny úkon
+          code: administration
+          typicalDurationMinutes: 10
+        - value: Odber krvi
+          code: blood-test
+          typicalDurationMinutes: 10

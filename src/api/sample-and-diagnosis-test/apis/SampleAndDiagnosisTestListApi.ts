@@ -22,8 +22,29 @@ import {
     TestListEntryToJSON,
 } from '../models';
 
+export interface CreateTestListEntryRequest {
+    sampleAndDiagnosisId: string;
+    testListEntry: TestListEntry;
+}
+
+export interface DeleteTestListEntryRequest {
+    sampleAndDiagnosisId: string;
+    entryId: string;
+}
+
 export interface GetTestListEntriesRequest {
     sampleAndDiagnosisId: string;
+}
+
+export interface GetTestListEntryRequest {
+    sampleAndDiagnosisId: string;
+    entryId: string;
+}
+
+export interface UpdateTestListEntryRequest {
+    sampleAndDiagnosisId: string;
+    entryId: string;
+    testListEntry: TestListEntry;
 }
 
 /**
@@ -33,6 +54,40 @@ export interface GetTestListEntriesRequest {
  * @interface SampleAndDiagnosisTestListApiInterface
  */
 export interface SampleAndDiagnosisTestListApiInterface {
+    /**
+     * Use this method to store new entry into the test list.
+     * @summary Saves new entry into test list
+     * @param {string} sampleAndDiagnosisId pass the id of the particular sample and diagnosis
+     * @param {TestListEntry} testListEntry Test list entry to store
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SampleAndDiagnosisTestListApiInterface
+     */
+    createTestListEntryRaw(requestParameters: CreateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestListEntry>>;
+
+    /**
+     * Use this method to store new entry into the test list.
+     * Saves new entry into test list
+     */
+    createTestListEntry(requestParameters: CreateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestListEntry>;
+
+    /**
+     * Use this method to delete the specific entry from the test list.
+     * @summary Deletes specific entry
+     * @param {string} sampleAndDiagnosisId pass the id of the particular sample and diagnosis
+     * @param {string} entryId pass the id of the particular entry in the test list
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SampleAndDiagnosisTestListApiInterface
+     */
+    deleteTestListEntryRaw(requestParameters: DeleteTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+
+    /**
+     * Use this method to delete the specific entry from the test list.
+     * Deletes specific entry
+     */
+    deleteTestListEntry(requestParameters: DeleteTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
     /**
      * By using sampleAndDiagnosisId you get list of entries in sample and diagnosis test list
      * @summary Provides the sample and diagnosis test list
@@ -49,12 +104,121 @@ export interface SampleAndDiagnosisTestListApiInterface {
      */
     getTestListEntries(requestParameters: GetTestListEntriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TestListEntry>>;
 
+    /**
+     * By using sampleAndDiagnosisId and entryId you can details of particular entry item sample and diagnosis.
+     * @summary Provides details about test list entry
+     * @param {string} sampleAndDiagnosisId pass the id of the particular sample and diagnosis
+     * @param {string} entryId pass the id of the particular entry in the test list
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SampleAndDiagnosisTestListApiInterface
+     */
+    getTestListEntryRaw(requestParameters: GetTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestListEntry>>;
+
+    /**
+     * By using sampleAndDiagnosisId and entryId you can details of particular entry item sample and diagnosis.
+     * Provides details about test list entry
+     */
+    getTestListEntry(requestParameters: GetTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestListEntry>;
+
+    /**
+     * Use this method to update content of the test list entry.
+     * @summary Updates specific entry
+     * @param {string} sampleAndDiagnosisId pass the id of the particular ambulance
+     * @param {string} entryId pass the id of the particular entry in the test list
+     * @param {TestListEntry} testListEntry Test list entry to update
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SampleAndDiagnosisTestListApiInterface
+     */
+    updateTestListEntryRaw(requestParameters: UpdateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestListEntry>>;
+
+    /**
+     * Use this method to update content of the test list entry.
+     * Updates specific entry
+     */
+    updateTestListEntry(requestParameters: UpdateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestListEntry>;
+
 }
 
 /**
  * 
  */
 export class SampleAndDiagnosisTestListApi extends runtime.BaseAPI implements SampleAndDiagnosisTestListApiInterface {
+
+    /**
+     * Use this method to store new entry into the test list.
+     * Saves new entry into test list
+     */
+    async createTestListEntryRaw(requestParameters: CreateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestListEntry>> {
+        if (requestParameters.sampleAndDiagnosisId === null || requestParameters.sampleAndDiagnosisId === undefined) {
+            throw new runtime.RequiredError('sampleAndDiagnosisId','Required parameter requestParameters.sampleAndDiagnosisId was null or undefined when calling createTestListEntry.');
+        }
+
+        if (requestParameters.testListEntry === null || requestParameters.testListEntry === undefined) {
+            throw new runtime.RequiredError('testListEntry','Required parameter requestParameters.testListEntry was null or undefined when calling createTestListEntry.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/test-list/{sampleAndDiagnosisId}/entries`.replace(`{${"sampleAndDiagnosisId"}}`, encodeURIComponent(String(requestParameters.sampleAndDiagnosisId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TestListEntryToJSON(requestParameters.testListEntry),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TestListEntryFromJSON(jsonValue));
+    }
+
+    /**
+     * Use this method to store new entry into the test list.
+     * Saves new entry into test list
+     */
+    async createTestListEntry(requestParameters: CreateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestListEntry> {
+        const response = await this.createTestListEntryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Use this method to delete the specific entry from the test list.
+     * Deletes specific entry
+     */
+    async deleteTestListEntryRaw(requestParameters: DeleteTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.sampleAndDiagnosisId === null || requestParameters.sampleAndDiagnosisId === undefined) {
+            throw new runtime.RequiredError('sampleAndDiagnosisId','Required parameter requestParameters.sampleAndDiagnosisId was null or undefined when calling deleteTestListEntry.');
+        }
+
+        if (requestParameters.entryId === null || requestParameters.entryId === undefined) {
+            throw new runtime.RequiredError('entryId','Required parameter requestParameters.entryId was null or undefined when calling deleteTestListEntry.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/test-list/{sampleAndDiagnosisId}/entries/{entryId}`.replace(`{${"sampleAndDiagnosisId"}}`, encodeURIComponent(String(requestParameters.sampleAndDiagnosisId))).replace(`{${"entryId"}}`, encodeURIComponent(String(requestParameters.entryId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Use this method to delete the specific entry from the test list.
+     * Deletes specific entry
+     */
+    async deleteTestListEntry(requestParameters: DeleteTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteTestListEntryRaw(requestParameters, initOverrides);
+    }
 
     /**
      * By using sampleAndDiagnosisId you get list of entries in sample and diagnosis test list
@@ -85,6 +249,85 @@ export class SampleAndDiagnosisTestListApi extends runtime.BaseAPI implements Sa
      */
     async getTestListEntries(requestParameters: GetTestListEntriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TestListEntry>> {
         const response = await this.getTestListEntriesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * By using sampleAndDiagnosisId and entryId you can details of particular entry item sample and diagnosis.
+     * Provides details about test list entry
+     */
+    async getTestListEntryRaw(requestParameters: GetTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestListEntry>> {
+        if (requestParameters.sampleAndDiagnosisId === null || requestParameters.sampleAndDiagnosisId === undefined) {
+            throw new runtime.RequiredError('sampleAndDiagnosisId','Required parameter requestParameters.sampleAndDiagnosisId was null or undefined when calling getTestListEntry.');
+        }
+
+        if (requestParameters.entryId === null || requestParameters.entryId === undefined) {
+            throw new runtime.RequiredError('entryId','Required parameter requestParameters.entryId was null or undefined when calling getTestListEntry.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/test-list/{sampleAndDiagnosisId}/entries/{entryId}`.replace(`{${"sampleAndDiagnosisId"}}`, encodeURIComponent(String(requestParameters.sampleAndDiagnosisId))).replace(`{${"entryId"}}`, encodeURIComponent(String(requestParameters.entryId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TestListEntryFromJSON(jsonValue));
+    }
+
+    /**
+     * By using sampleAndDiagnosisId and entryId you can details of particular entry item sample and diagnosis.
+     * Provides details about test list entry
+     */
+    async getTestListEntry(requestParameters: GetTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestListEntry> {
+        const response = await this.getTestListEntryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Use this method to update content of the test list entry.
+     * Updates specific entry
+     */
+    async updateTestListEntryRaw(requestParameters: UpdateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TestListEntry>> {
+        if (requestParameters.sampleAndDiagnosisId === null || requestParameters.sampleAndDiagnosisId === undefined) {
+            throw new runtime.RequiredError('sampleAndDiagnosisId','Required parameter requestParameters.sampleAndDiagnosisId was null or undefined when calling updateTestListEntry.');
+        }
+
+        if (requestParameters.entryId === null || requestParameters.entryId === undefined) {
+            throw new runtime.RequiredError('entryId','Required parameter requestParameters.entryId was null or undefined when calling updateTestListEntry.');
+        }
+
+        if (requestParameters.testListEntry === null || requestParameters.testListEntry === undefined) {
+            throw new runtime.RequiredError('testListEntry','Required parameter requestParameters.testListEntry was null or undefined when calling updateTestListEntry.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/test-list/{sampleAndDiagnosisId}/entries/{entryId}`.replace(`{${"sampleAndDiagnosisId"}}`, encodeURIComponent(String(requestParameters.sampleAndDiagnosisId))).replace(`{${"entryId"}}`, encodeURIComponent(String(requestParameters.entryId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TestListEntryToJSON(requestParameters.testListEntry),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TestListEntryFromJSON(jsonValue));
+    }
+
+    /**
+     * Use this method to update content of the test list entry.
+     * Updates specific entry
+     */
+    async updateTestListEntry(requestParameters: UpdateTestListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TestListEntry> {
+        const response = await this.updateTestListEntryRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
