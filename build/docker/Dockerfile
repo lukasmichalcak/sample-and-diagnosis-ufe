@@ -1,6 +1,11 @@
 ### compilation stage
 FROM node:latest AS build
 
+# 1. Prevent the "stuck" download
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+# 2. Tell Stencil/Puppeteer where the executable is (if needed)
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
+
 RUN mkdir /build
 WORKDIR /build
 
