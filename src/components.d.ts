@@ -7,15 +7,19 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MglmSampleAndDiagnosisTestApp {
+        "apiBase": string;
         /**
           * @default ""
          */
         "basePath": string;
+        "sampleAndDiagnosisId": string;
     }
     interface MglmSampleAndDiagnosisTestEditor {
         "entryId": string;
     }
     interface MglmSampleAndDiagnosisTestList {
+        "apiBase": string;
+        "sampleAndDiagnosisId": string;
     }
     interface MyComponent {
         /**
@@ -96,17 +100,21 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MglmSampleAndDiagnosisTestApp {
+        "apiBase"?: string;
         /**
           * @default ""
          */
         "basePath"?: string;
+        "sampleAndDiagnosisId"?: string;
     }
     interface MglmSampleAndDiagnosisTestEditor {
         "entryId"?: string;
         "onEditor-closed"?: (event: MglmSampleAndDiagnosisTestEditorCustomEvent<string>) => void;
     }
     interface MglmSampleAndDiagnosisTestList {
+        "apiBase"?: string;
         "onEntry-clicked"?: (event: MglmSampleAndDiagnosisTestListCustomEvent<string>) => void;
+        "sampleAndDiagnosisId"?: string;
     }
     interface MyComponent {
         /**
@@ -125,9 +133,15 @@ declare namespace LocalJSX {
 
     interface MglmSampleAndDiagnosisTestAppAttributes {
         "basePath": string;
+        "apiBase": string;
+        "sampleAndDiagnosisId": string;
     }
     interface MglmSampleAndDiagnosisTestEditorAttributes {
         "entryId": string;
+    }
+    interface MglmSampleAndDiagnosisTestListAttributes {
+        "apiBase": string;
+        "sampleAndDiagnosisId": string;
     }
     interface MyComponentAttributes {
         "first": string;
@@ -138,7 +152,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "mglm-sample-and-diagnosis-test-app": Omit<MglmSampleAndDiagnosisTestApp, keyof MglmSampleAndDiagnosisTestAppAttributes> & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes]?: MglmSampleAndDiagnosisTestApp[K] } & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestAppAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestApp[K] };
         "mglm-sample-and-diagnosis-test-editor": Omit<MglmSampleAndDiagnosisTestEditor, keyof MglmSampleAndDiagnosisTestEditorAttributes> & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes]?: MglmSampleAndDiagnosisTestEditor[K] } & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestEditorAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestEditor[K] };
-        "mglm-sample-and-diagnosis-test-list": MglmSampleAndDiagnosisTestList;
+        "mglm-sample-and-diagnosis-test-list": Omit<MglmSampleAndDiagnosisTestList, keyof MglmSampleAndDiagnosisTestListAttributes> & { [K in keyof MglmSampleAndDiagnosisTestList & keyof MglmSampleAndDiagnosisTestListAttributes]?: MglmSampleAndDiagnosisTestList[K] } & { [K in keyof MglmSampleAndDiagnosisTestList & keyof MglmSampleAndDiagnosisTestListAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestListAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestList & keyof MglmSampleAndDiagnosisTestListAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestList[K] };
         "my-component": Omit<MyComponent, keyof MyComponentAttributes> & { [K in keyof MyComponent & keyof MyComponentAttributes]?: MyComponent[K] } & { [K in keyof MyComponent & keyof MyComponentAttributes as `attr:${K}`]?: MyComponentAttributes[K] } & { [K in keyof MyComponent & keyof MyComponentAttributes as `prop:${K}`]?: MyComponent[K] };
     }
 }

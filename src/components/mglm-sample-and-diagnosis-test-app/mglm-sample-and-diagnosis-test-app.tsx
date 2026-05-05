@@ -11,8 +11,9 @@ declare global {
 })
 export class MglmSampleAndDiagnosisTestApp {
   @State() private relativePath = "";
-
   @Prop() basePath: string="";
+  @Prop() apiBase: string;
+  @Prop() sampleAndDiagnosisId: string;
 
   componentWillLoad() {
     const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
@@ -55,7 +56,7 @@ export class MglmSampleAndDiagnosisTestApp {
         ? <mglm-sample-and-diagnosis-test-editor entry-id={entryId}
             oneditor-closed={ () => navigate("./list")} >
           </mglm-sample-and-diagnosis-test-editor>
-        : <mglm-sample-and-diagnosis-test-list
+        : <mglm-sample-and-diagnosis-test-list sample-and-diagnosis-id={this.sampleAndDiagnosisId} api-base={this.apiBase}
             onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
         </mglm-sample-and-diagnosis-test-list>
         }

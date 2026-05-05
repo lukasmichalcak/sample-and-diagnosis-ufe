@@ -1,0 +1,156 @@
+openapi: 3.0.0
+servers:
+  - description: Cluster Endpoint
+    url: /api
+info:
+  description: Sample And Diagnosis Test List management for Web-In-Cloud system
+  version: "1.0.0"
+  title: Sample And Diagnosis Test List Api
+  contact:
+    email: your_email@stuba.sk
+  license:
+    name: CC BY 4.0
+    url: "https://creativecommons.org/licenses/by/4.0/"
+tags:
+- name: sampleAndDiagnosisTestList
+  description: Sample And Diagnosis Test List API
+paths:
+  "/test-list/{sampleAndDiagnosisId}/entries":
+    get:
+      tags:
+        - sampleAndDiagnosisTestList
+      summary: Provides the sample and diagnosis test list
+      operationId: getTestListEntries
+      description: By using sampleAndDiagnosisId you get list of entries in sample and diagnosis test list
+      parameters:
+        - in: path
+          name: sampleAndDiagnosisId
+          description: pass the id of the particular sample and diagnosis
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: value of the test list entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TestListEntry"
+              examples:
+                response:
+                  $ref: "#/components/examples/TestListEntriesExample"
+        "404":
+          description: Sample and diagnosis with such ID does not exist
+components:
+  schemas:
+    TestListEntry:
+      type: object
+      required: [id, patientId, testSince, estimatedDurationMinutes]
+      properties:
+        id:
+          type: string
+          example: x321ab3
+          description: Unique id of the entry in this test list
+        name:
+          type: string
+          example: Jožko Púčik
+          description: Name of patient in test list
+        patientId:
+          type: string
+          example: 460527-jozef-pucik
+          description: Unique identifier of the patient known to Web-In-Cloud system
+        testSince:
+          type: string
+          format: date-time
+          example: "2038-12-24T10:05:00Z"
+          description: Timestamp since when the patient entered the test list
+        estimatedStart:
+          type: string
+          format: date-time
+          example: "2038-12-24T10:35:00Z"
+          description: Estimated time of entering sample and diagnosis. Ignored on post.
+        estimatedDurationMinutes:
+          type: integer
+          format: int32
+          example: 15
+          description: >-
+            Estimated duration of sample and diagnosis visit. If not provided then it will
+            be computed based on condition and sample and diagnosis settings
+        condition:
+          $ref: "#/components/schemas/Condition"
+      example:
+        $ref: "#/components/examples/TestListEntryExample"
+    Condition:
+      description: "Describes disease, symptoms, or other reasons of patient   visit"
+      required:
+        - value
+      properties:
+        value:
+          type: string
+          example: Teploty
+        code:
+          type: string
+          example: subfebrilia
+        reference:
+          type: string
+          format: url
+          example: "https://zdravoteka.sk/priznaky/zvysena-telesna-teplota/"
+          description: Link to encyclopedical explanation of the patient's condition
+        typicalDurationMinutes:
+          type: integer
+          format: int32
+          example: 20
+      example:
+        $ref: "#/components/examples/ConditionExample"
+  examples:
+    TestListEntryExample:
+      summary: Ľudomír Zlostný test
+      description: |
+        Entry represents a patient test in the sample and diagnosis prep room with
+        defined symptoms
+      value:
+        id: x321ab3
+        name: Ľudomír Zlostný
+        patientId: 74895-ludomir-zlostny
+        testSince: "2038-12-24T10:05:00.000Z"
+        estimatedStart: "2038-12-24T10:35:00.000Z"
+        estimatedDurationMinutes: 15
+        condition:
+          value: Nevoľnosť
+          code: nausea
+          reference: "https://zdravoteka.sk/priznaky/nevolnost/"
+    ConditionExample:
+      summary: Conditions and symptoms
+      description: list of few symptoms that can be chosen by patients
+      value:
+        valuee: Teploty
+        code: subfebrilia
+        reference: >-
+          https://zdravoteka.sk/priznaky/zvysena-telesna-teplota/
+    TestListEntriesExample:
+      summary: List of test patients
+      description: |
+        Example test list containing 2 patients
+      value:
+      - id: x321ab3
+        name: Jožko Púčik
+        patientId: 460527-jozef-pucik
+        testSince: "2038-12-24T10:05:00.000Z"
+        estimatedStart: "2038-12-24T10:35:00.000Z"
+        estimatedDurationMinutes: 15
+        condition:
+          value: Teploty
+          code: subfebrilia
+          reference: "https://zdravoteka.sk/priznaky/zvysena-telesna-teplota/"
+      - id: x321ab4
+        name: Ferdinand Trety
+        patientId: 780907-ferdinand-tre
+        testSince: "2038-12-24T10:25:00.000Z"
+        estimatedStart: "2038-12-24T10:50:00.000Z"
+        estimatedDurationMinutes: 25
+        condition:
+          value: Nevoľnosť
+          code: nausea
+          reference: "https://zdravoteka.sk/priznaky/nevolnost/"
