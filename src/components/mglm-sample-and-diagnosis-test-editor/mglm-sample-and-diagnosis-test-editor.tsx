@@ -34,6 +34,7 @@ export class MglmSampleAndDiagnosisTestEditor {
           testSince: new Date(Date.now()),
           estimatedDurationMinutes: 15
         };
+        this.entry.estimatedStart = await this.assumedEntryDateAsync();
         return this.entry;
       }
 
@@ -60,6 +61,29 @@ export class MglmSampleAndDiagnosisTestEditor {
       this.errorMessage = `Cannot retrieve list of test patients: ${err.message || "unknown"}`
     }
     return undefined;
+  }
+
+  private async assumedEntryDateAsync(): Promise<Date> {
+    try {
+      const configuration = new Configuration({
+        basePath: this.apiBase,
+      });
+
+      const waitingListApi = new SampleAndDiagnosisTestListApi(configuration);
+      const response = await waitingListApi.getTestListEntriesRaw({sampleAndDiagnosisId: this.sampleAndDiagnosisId})
+      if (response.raw.status > 299) {
+        return new Date();
+      }
+      const lastPatientOut = (await response.value())
+        .map((_: TestListEntry) =>
+            _.estimatedStart.getTime()
+            + _.estimatedDurationMinutes * 60 * 1000
+        )
+        .reduce((acc: number, value: number) => Math.max(acc, value), 0);
+      return new Date(Math.max(Date.now(), lastPatientOut));
+    } catch (err: any) {
+      return new Date();
+    }
   }
 
   private async getConditions(): Promise<Condition[]> {
@@ -117,9 +141,15 @@ export class MglmSampleAndDiagnosisTestEditor {
           <md-icon slot="leading-icon">fingerprint</md-icon>
         </md-filled-text-field>
 
-        <md-filled-text-field label="Čakáte od" disabled
-          value={this.entry?.testSince}>
+        <md-filled-text-field disabled
+          label="Čakáte od"
+          value={new Date(this.entry?.testSince || Date.now()).toLocaleTimeString()}>
           <md-icon slot="leading-icon">watch_later</md-icon>
+        </md-filled-text-field>
+        <md-filled-text-field disabled
+                        label="Predpokladaný čas vyšetrenia"
+                        value={new Date(this.entry?.estimatedStart || Date.now()).toLocaleTimeString()}>
+                        <md-icon slot="leading-icon">login</md-icon>
         </md-filled-text-field>
 
         {/* pre prehľadnosť použijeme pomocnú metódu */}

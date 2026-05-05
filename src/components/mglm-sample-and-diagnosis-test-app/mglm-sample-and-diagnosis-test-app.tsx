@@ -36,6 +36,7 @@ export class MglmSampleAndDiagnosisTestApp {
   }
 
   render() {
+    console.debug("mglm-sample-and-diagnosis-test-app.render() - path: %s", this.relativePath);
     let element = "list"
     let entryId = "@new"
 
