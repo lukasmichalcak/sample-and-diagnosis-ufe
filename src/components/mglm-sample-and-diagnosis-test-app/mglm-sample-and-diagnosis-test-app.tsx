@@ -1,8 +1,5 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
-
-declare global {
-  interface Window { navigation: any; }
-}
+import { UserRole } from '../../domain/sample';
 
 @Component({
   tag: 'mglm-sample-and-diagnosis-test-app',
@@ -10,60 +7,69 @@ declare global {
   shadow: true,
 })
 export class MglmSampleAndDiagnosisTestApp {
-  @State() private relativePath = "";
-  @Prop() basePath: string="";
+  @Prop() basePath: string = '';
   @Prop() apiBase: string;
   @Prop() sampleAndDiagnosisId: string;
 
-  componentWillLoad() {
-    const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
-
-    const toRelative = (path: string) => {
-      if (path.startsWith( baseUri)) {
-        this.relativePath = path.slice(baseUri.length)
-      } else {
-        this.relativePath = ""
-      }
-    }
-
-    window.navigation?.addEventListener("navigate", (ev: Event) => {
-      if ((ev as any).canIntercept) { (ev as any).intercept(); }
-      let path = new URL((ev as any).destination.url).pathname;
-      toRelative(path);
-    });
-
-    toRelative(location.pathname)
-  }
+  @State() private activeRole: UserRole = 'technician';
 
   render() {
-    console.debug("mglm-sample-and-diagnosis-test-app.render() - path: %s", this.relativePath);
-    let element = "list"
-    let entryId = "@new"
-
-    if ( this.relativePath.startsWith("entry/"))
-    {
-      element = "editor";
-      entryId = this.relativePath.split("/")[1]
-    }
-
-    const navigate = (path:string) => {
-      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-      window.navigation.navigate(absolute)
-    }
-
     return (
       <Host>
-        { element === "editor"
-        ? <mglm-sample-and-diagnosis-test-editor entry-id={entryId}
-          sample-and-diagnosis-id={this.sampleAndDiagnosisId} api-base={this.apiBase}
-            oneditor-closed={ () => navigate("./list")} >
-          </mglm-sample-and-diagnosis-test-editor>
-        : <mglm-sample-and-diagnosis-test-list sample-and-diagnosis-id={this.sampleAndDiagnosisId} api-base={this.apiBase}
-            onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
-        </mglm-sample-and-diagnosis-test-list>
-        }
-
+        <div class="app-shell">
+          {this.renderTopNav()}
+          <main>{this.renderActiveView()}</main>
+        </div>
       </Host>
     );
+  }
+
+  private renderTopNav() {
+    return (
+      <header class="top-bar">
+        <div>
+          <h1>Sample and Diagnosis</h1>
+          <p>Local UFE workflow prototype</p>
+        </div>
+        <nav aria-label="Role navigation">
+          <button
+            class={this.activeRole === 'technician' ? 'role-button active' : 'role-button'}
+            type="button"
+            onClick={() => this.activeRole = 'technician'}
+          >
+            <md-icon>biotech</md-icon>
+            <span>Technician</span>
+          </button>
+          <button
+            class={this.activeRole === 'diagnostician' ? 'role-button active' : 'role-button'}
+            type="button"
+            onClick={() => this.activeRole = 'diagnostician'}
+          >
+            <md-icon>clinical_notes</md-icon>
+            <span>Diagnostician</span>
+          </button>
+          <button
+            class={this.activeRole === 'docs' ? 'role-button active' : 'role-button'}
+            type="button"
+            onClick={() => this.activeRole = 'docs'}
+          >
+            <md-icon>folder_open</md-icon>
+            <span>Docs</span>
+          </button>
+        </nav>
+      </header>
+    );
+  }
+
+  private renderActiveView() {
+    if (this.activeRole === 'diagnostician') {
+      return <mglm-diagnostician-view></mglm-diagnostician-view>;
+    }
+
+    if (this.activeRole === 'docs') {
+      return <mglm-docs-view></mglm-docs-view>;
+    }
+
+    return <mglm-technician-view></mglm-technician-view>;
   }
 }

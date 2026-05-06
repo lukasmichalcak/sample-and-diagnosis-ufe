@@ -6,18 +6,18 @@
   padding-bottom: 2rem;
 }
 
-.error {
-  margin: auto;
-  color: red;
-  font-size: 2rem;
-  font-weight: 900;
-  text-align: center;
+.legacy-placeholder {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1d1b20;
+  font-family: Roboto, Arial, sans-serif;
 }
 
-.add-button {
-  position: absolute;
-  right: 1rem;
-  bottom: 0;
-  --md-filled-icon-button-container-size: 4rem;
-  --md-filled-icon-button-icon-size: 3rem;
+.legacy-placeholder p {
+  margin: 0;
+  color: #5f6368;
 }

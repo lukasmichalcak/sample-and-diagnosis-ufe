@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Sample And Diagnosis Test List Api
- * Sample And Diagnosis Test List management for Web-In-Cloud system
+ * Sample And Diagnosis API
+ * Sample collection, measurement, diagnostics, and patient documentation API.
  *
  * The version of the OpenAPI document: 1.0.0
  * Contact: your_email@stuba.sk

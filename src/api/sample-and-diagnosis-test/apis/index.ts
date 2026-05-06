@@ -1,4 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './SampleAndDiagnosisConditionsApi';
-export * from './SampleAndDiagnosisTestListApi';
+export * from './PatientReportsApi';
+export * from './SampleMeasurementsApi';
+export * from './SampleReportsApi';
+export * from './SamplesApi';
+export * from './TestTypesApi';

@@ -5,11 +5,39 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { MeasurementValue, NewSampleDraft, UserRole } from "./domain/sample";
+import { ReportDraft } from "./components/mglm-report-editor/mglm-report-editor";
+export { MeasurementValue, NewSampleDraft, UserRole } from "./domain/sample";
+export { ReportDraft } from "./components/mglm-report-editor/mglm-report-editor";
 export namespace Components {
+    interface MglmDiagnosticianView {
+    }
+    interface MglmDocsView {
+    }
+    interface MglmMeasurementsEditor {
+        /**
+          * @default []
+         */
+        "measurements": MeasurementValue[];
+        /**
+          * @default 'diagnostician'
+         */
+        "role": UserRole;
+    }
+    interface MglmReportEditor {
+        /**
+          * @default false
+         */
+        "canDiscard": boolean;
+        /**
+          * @default {     summary: '',     conclusion: '',     recommendations: '',   }
+         */
+        "reportDraft": ReportDraft;
+    }
     interface MglmSampleAndDiagnosisTestApp {
         "apiBase": string;
         /**
-          * @default ""
+          * @default ''
          */
         "basePath": string;
         "sampleAndDiagnosisId": string;
@@ -22,6 +50,27 @@ export namespace Components {
     interface MglmSampleAndDiagnosisTestList {
         "apiBase": string;
         "sampleAndDiagnosisId": string;
+    }
+    interface MglmSampleDraftForm {
+        /**
+          * @default 'Cancel'
+         */
+        "cancelLabel": string;
+        /**
+          * @default 'The technician records sample metadata and selects required tests. Measured values are entered during diagnostics.'
+         */
+        "description": string;
+        "draft": NewSampleDraft;
+        /**
+          * @default 'Sample draft'
+         */
+        "formTitle": string;
+        /**
+          * @default 'Save'
+         */
+        "submitLabel": string;
+    }
+    interface MglmTechnicianView {
     }
     interface MyComponent {
         /**
@@ -38,6 +87,14 @@ export namespace Components {
         "middle"?: string;
     }
 }
+export interface MglmMeasurementsEditorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMglmMeasurementsEditorElement;
+}
+export interface MglmReportEditorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMglmReportEditorElement;
+}
 export interface MglmSampleAndDiagnosisTestEditorCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMglmSampleAndDiagnosisTestEditorElement;
@@ -46,7 +103,60 @@ export interface MglmSampleAndDiagnosisTestListCustomEvent<T> extends CustomEven
     detail: T;
     target: HTMLMglmSampleAndDiagnosisTestListElement;
 }
+export interface MglmSampleDraftFormCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMglmSampleDraftFormElement;
+}
 declare global {
+    interface HTMLMglmDiagnosticianViewElement extends Components.MglmDiagnosticianView, HTMLStencilElement {
+    }
+    var HTMLMglmDiagnosticianViewElement: {
+        prototype: HTMLMglmDiagnosticianViewElement;
+        new (): HTMLMglmDiagnosticianViewElement;
+    };
+    interface HTMLMglmDocsViewElement extends Components.MglmDocsView, HTMLStencilElement {
+    }
+    var HTMLMglmDocsViewElement: {
+        prototype: HTMLMglmDocsViewElement;
+        new (): HTMLMglmDocsViewElement;
+    };
+    interface HTMLMglmMeasurementsEditorElementEventMap {
+        "measurementsChanged": MeasurementValue[];
+    }
+    interface HTMLMglmMeasurementsEditorElement extends Components.MglmMeasurementsEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMglmMeasurementsEditorElementEventMap>(type: K, listener: (this: HTMLMglmMeasurementsEditorElement, ev: MglmMeasurementsEditorCustomEvent<HTMLMglmMeasurementsEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMglmMeasurementsEditorElementEventMap>(type: K, listener: (this: HTMLMglmMeasurementsEditorElement, ev: MglmMeasurementsEditorCustomEvent<HTMLMglmMeasurementsEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMglmMeasurementsEditorElement: {
+        prototype: HTMLMglmMeasurementsEditorElement;
+        new (): HTMLMglmMeasurementsEditorElement;
+    };
+    interface HTMLMglmReportEditorElementEventMap {
+        "reportDraftChanged": ReportDraft;
+        "reportPreliminarySaved": void;
+        "reportPreliminaryDiscarded": void;
+        "reportFinalized": void;
+    }
+    interface HTMLMglmReportEditorElement extends Components.MglmReportEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMglmReportEditorElementEventMap>(type: K, listener: (this: HTMLMglmReportEditorElement, ev: MglmReportEditorCustomEvent<HTMLMglmReportEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMglmReportEditorElementEventMap>(type: K, listener: (this: HTMLMglmReportEditorElement, ev: MglmReportEditorCustomEvent<HTMLMglmReportEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMglmReportEditorElement: {
+        prototype: HTMLMglmReportEditorElement;
+        new (): HTMLMglmReportEditorElement;
+    };
     interface HTMLMglmSampleAndDiagnosisTestAppElement extends Components.MglmSampleAndDiagnosisTestApp, HTMLStencilElement {
     }
     var HTMLMglmSampleAndDiagnosisTestAppElement: {
@@ -87,6 +197,30 @@ declare global {
         prototype: HTMLMglmSampleAndDiagnosisTestListElement;
         new (): HTMLMglmSampleAndDiagnosisTestListElement;
     };
+    interface HTMLMglmSampleDraftFormElementEventMap {
+        "sampleDraftSubmit": NewSampleDraft;
+        "sampleDraftCancel": void;
+    }
+    interface HTMLMglmSampleDraftFormElement extends Components.MglmSampleDraftForm, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMglmSampleDraftFormElementEventMap>(type: K, listener: (this: HTMLMglmSampleDraftFormElement, ev: MglmSampleDraftFormCustomEvent<HTMLMglmSampleDraftFormElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMglmSampleDraftFormElementEventMap>(type: K, listener: (this: HTMLMglmSampleDraftFormElement, ev: MglmSampleDraftFormCustomEvent<HTMLMglmSampleDraftFormElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMglmSampleDraftFormElement: {
+        prototype: HTMLMglmSampleDraftFormElement;
+        new (): HTMLMglmSampleDraftFormElement;
+    };
+    interface HTMLMglmTechnicianViewElement extends Components.MglmTechnicianView, HTMLStencilElement {
+    }
+    var HTMLMglmTechnicianViewElement: {
+        prototype: HTMLMglmTechnicianViewElement;
+        new (): HTMLMglmTechnicianViewElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -94,17 +228,52 @@ declare global {
         new (): HTMLMyComponentElement;
     };
     interface HTMLElementTagNameMap {
+        "mglm-diagnostician-view": HTMLMglmDiagnosticianViewElement;
+        "mglm-docs-view": HTMLMglmDocsViewElement;
+        "mglm-measurements-editor": HTMLMglmMeasurementsEditorElement;
+        "mglm-report-editor": HTMLMglmReportEditorElement;
         "mglm-sample-and-diagnosis-test-app": HTMLMglmSampleAndDiagnosisTestAppElement;
         "mglm-sample-and-diagnosis-test-editor": HTMLMglmSampleAndDiagnosisTestEditorElement;
         "mglm-sample-and-diagnosis-test-list": HTMLMglmSampleAndDiagnosisTestListElement;
+        "mglm-sample-draft-form": HTMLMglmSampleDraftFormElement;
+        "mglm-technician-view": HTMLMglmTechnicianViewElement;
         "my-component": HTMLMyComponentElement;
     }
 }
 declare namespace LocalJSX {
+    interface MglmDiagnosticianView {
+    }
+    interface MglmDocsView {
+    }
+    interface MglmMeasurementsEditor {
+        /**
+          * @default []
+         */
+        "measurements"?: MeasurementValue[];
+        "onMeasurementsChanged"?: (event: MglmMeasurementsEditorCustomEvent<MeasurementValue[]>) => void;
+        /**
+          * @default 'diagnostician'
+         */
+        "role"?: UserRole;
+    }
+    interface MglmReportEditor {
+        /**
+          * @default false
+         */
+        "canDiscard"?: boolean;
+        "onReportDraftChanged"?: (event: MglmReportEditorCustomEvent<ReportDraft>) => void;
+        "onReportFinalized"?: (event: MglmReportEditorCustomEvent<void>) => void;
+        "onReportPreliminaryDiscarded"?: (event: MglmReportEditorCustomEvent<void>) => void;
+        "onReportPreliminarySaved"?: (event: MglmReportEditorCustomEvent<void>) => void;
+        /**
+          * @default {     summary: '',     conclusion: '',     recommendations: '',   }
+         */
+        "reportDraft"?: ReportDraft;
+    }
     interface MglmSampleAndDiagnosisTestApp {
         "apiBase"?: string;
         /**
-          * @default ""
+          * @default ''
          */
         "basePath"?: string;
         "sampleAndDiagnosisId"?: string;
@@ -119,6 +288,29 @@ declare namespace LocalJSX {
         "apiBase"?: string;
         "onEntry-clicked"?: (event: MglmSampleAndDiagnosisTestListCustomEvent<string>) => void;
         "sampleAndDiagnosisId"?: string;
+    }
+    interface MglmSampleDraftForm {
+        /**
+          * @default 'Cancel'
+         */
+        "cancelLabel"?: string;
+        /**
+          * @default 'The technician records sample metadata and selects required tests. Measured values are entered during diagnostics.'
+         */
+        "description"?: string;
+        "draft"?: NewSampleDraft;
+        /**
+          * @default 'Sample draft'
+         */
+        "formTitle"?: string;
+        "onSampleDraftCancel"?: (event: MglmSampleDraftFormCustomEvent<void>) => void;
+        "onSampleDraftSubmit"?: (event: MglmSampleDraftFormCustomEvent<NewSampleDraft>) => void;
+        /**
+          * @default 'Save'
+         */
+        "submitLabel"?: string;
+    }
+    interface MglmTechnicianView {
     }
     interface MyComponent {
         /**
@@ -135,6 +327,12 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
 
+    interface MglmMeasurementsEditorAttributes {
+        "role": UserRole;
+    }
+    interface MglmReportEditorAttributes {
+        "canDiscard": boolean;
+    }
     interface MglmSampleAndDiagnosisTestAppAttributes {
         "basePath": string;
         "apiBase": string;
@@ -149,6 +347,12 @@ declare namespace LocalJSX {
         "apiBase": string;
         "sampleAndDiagnosisId": string;
     }
+    interface MglmSampleDraftFormAttributes {
+        "formTitle": string;
+        "submitLabel": string;
+        "cancelLabel": string;
+        "description": string;
+    }
     interface MyComponentAttributes {
         "first": string;
         "middle": string;
@@ -156,9 +360,15 @@ declare namespace LocalJSX {
     }
 
     interface IntrinsicElements {
+        "mglm-diagnostician-view": MglmDiagnosticianView;
+        "mglm-docs-view": MglmDocsView;
+        "mglm-measurements-editor": Omit<MglmMeasurementsEditor, keyof MglmMeasurementsEditorAttributes> & { [K in keyof MglmMeasurementsEditor & keyof MglmMeasurementsEditorAttributes]?: MglmMeasurementsEditor[K] } & { [K in keyof MglmMeasurementsEditor & keyof MglmMeasurementsEditorAttributes as `attr:${K}`]?: MglmMeasurementsEditorAttributes[K] } & { [K in keyof MglmMeasurementsEditor & keyof MglmMeasurementsEditorAttributes as `prop:${K}`]?: MglmMeasurementsEditor[K] };
+        "mglm-report-editor": Omit<MglmReportEditor, keyof MglmReportEditorAttributes> & { [K in keyof MglmReportEditor & keyof MglmReportEditorAttributes]?: MglmReportEditor[K] } & { [K in keyof MglmReportEditor & keyof MglmReportEditorAttributes as `attr:${K}`]?: MglmReportEditorAttributes[K] } & { [K in keyof MglmReportEditor & keyof MglmReportEditorAttributes as `prop:${K}`]?: MglmReportEditor[K] };
         "mglm-sample-and-diagnosis-test-app": Omit<MglmSampleAndDiagnosisTestApp, keyof MglmSampleAndDiagnosisTestAppAttributes> & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes]?: MglmSampleAndDiagnosisTestApp[K] } & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestAppAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestApp & keyof MglmSampleAndDiagnosisTestAppAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestApp[K] };
         "mglm-sample-and-diagnosis-test-editor": Omit<MglmSampleAndDiagnosisTestEditor, keyof MglmSampleAndDiagnosisTestEditorAttributes> & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes]?: MglmSampleAndDiagnosisTestEditor[K] } & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestEditorAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestEditor & keyof MglmSampleAndDiagnosisTestEditorAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestEditor[K] };
         "mglm-sample-and-diagnosis-test-list": Omit<MglmSampleAndDiagnosisTestList, keyof MglmSampleAndDiagnosisTestListAttributes> & { [K in keyof MglmSampleAndDiagnosisTestList & keyof MglmSampleAndDiagnosisTestListAttributes]?: MglmSampleAndDiagnosisTestList[K] } & { [K in keyof MglmSampleAndDiagnosisTestList & keyof MglmSampleAndDiagnosisTestListAttributes as `attr:${K}`]?: MglmSampleAndDiagnosisTestListAttributes[K] } & { [K in keyof MglmSampleAndDiagnosisTestList & keyof MglmSampleAndDiagnosisTestListAttributes as `prop:${K}`]?: MglmSampleAndDiagnosisTestList[K] };
+        "mglm-sample-draft-form": Omit<MglmSampleDraftForm, keyof MglmSampleDraftFormAttributes> & { [K in keyof MglmSampleDraftForm & keyof MglmSampleDraftFormAttributes]?: MglmSampleDraftForm[K] } & { [K in keyof MglmSampleDraftForm & keyof MglmSampleDraftFormAttributes as `attr:${K}`]?: MglmSampleDraftFormAttributes[K] } & { [K in keyof MglmSampleDraftForm & keyof MglmSampleDraftFormAttributes as `prop:${K}`]?: MglmSampleDraftForm[K] };
+        "mglm-technician-view": MglmTechnicianView;
         "my-component": Omit<MyComponent, keyof MyComponentAttributes> & { [K in keyof MyComponent & keyof MyComponentAttributes]?: MyComponent[K] } & { [K in keyof MyComponent & keyof MyComponentAttributes as `attr:${K}`]?: MyComponentAttributes[K] } & { [K in keyof MyComponent & keyof MyComponentAttributes as `prop:${K}`]?: MyComponent[K] };
     }
 }
@@ -166,9 +376,15 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "mglm-diagnostician-view": LocalJSX.IntrinsicElements["mglm-diagnostician-view"] & JSXBase.HTMLAttributes<HTMLMglmDiagnosticianViewElement>;
+            "mglm-docs-view": LocalJSX.IntrinsicElements["mglm-docs-view"] & JSXBase.HTMLAttributes<HTMLMglmDocsViewElement>;
+            "mglm-measurements-editor": LocalJSX.IntrinsicElements["mglm-measurements-editor"] & JSXBase.HTMLAttributes<HTMLMglmMeasurementsEditorElement>;
+            "mglm-report-editor": LocalJSX.IntrinsicElements["mglm-report-editor"] & JSXBase.HTMLAttributes<HTMLMglmReportEditorElement>;
             "mglm-sample-and-diagnosis-test-app": LocalJSX.IntrinsicElements["mglm-sample-and-diagnosis-test-app"] & JSXBase.HTMLAttributes<HTMLMglmSampleAndDiagnosisTestAppElement>;
             "mglm-sample-and-diagnosis-test-editor": LocalJSX.IntrinsicElements["mglm-sample-and-diagnosis-test-editor"] & JSXBase.HTMLAttributes<HTMLMglmSampleAndDiagnosisTestEditorElement>;
             "mglm-sample-and-diagnosis-test-list": LocalJSX.IntrinsicElements["mglm-sample-and-diagnosis-test-list"] & JSXBase.HTMLAttributes<HTMLMglmSampleAndDiagnosisTestListElement>;
+            "mglm-sample-draft-form": LocalJSX.IntrinsicElements["mglm-sample-draft-form"] & JSXBase.HTMLAttributes<HTMLMglmSampleDraftFormElement>;
+            "mglm-technician-view": LocalJSX.IntrinsicElements["mglm-technician-view"] & JSXBase.HTMLAttributes<HTMLMglmTechnicianViewElement>;
             "my-component": LocalJSX.IntrinsicElements["my-component"] & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
     }
