@@ -112,7 +112,7 @@ function fromApiSample(sample: ApiSample): Sample {
 function toApiNewSample(draft: NewSampleDraft): ApiNewSample {
   return {
     patientName: draft.patientName.trim(),
-    patientId: draft.patientId?.trim() || undefined,
+    patientId: draft.patientId?.trim() || '',
     sampleCode: draft.sampleCode.trim(),
     collectedAt: new Date(fromDateTimeInputValue(draft.collectedAt)),
     testTypes: [...draft.testTypes],

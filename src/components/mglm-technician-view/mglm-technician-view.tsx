@@ -197,6 +197,10 @@ export class MglmTechnicianView {
       window.alert('Patient name is required.');
       return false;
     }
+    if (!draft.patientId?.trim()) {
+      window.alert('Patient identifier is required.');
+      return false;
+    }
     if (!draft.sampleCode.trim()) {
       window.alert('Sample code is required.');
       return false;

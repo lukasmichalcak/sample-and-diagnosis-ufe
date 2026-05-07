@@ -30,7 +30,7 @@ export interface NewSample {
      * @type {string}
      * @memberof NewSample
      */
-    patientId?: string;
+    patientId: string;
     /**
      * 
      * @type {string}
@@ -57,6 +57,7 @@ export interface NewSample {
 export function instanceOfNewSample(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "patientName" in value;
+    isInstance = isInstance && "patientId" in value;
     isInstance = isInstance && "sampleCode" in value;
     isInstance = isInstance && "collectedAt" in value;
     isInstance = isInstance && "testTypes" in value;
@@ -75,7 +76,7 @@ export function NewSampleFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'patientName': json['patientName'],
-        'patientId': !exists(json, 'patientId') ? undefined : json['patientId'],
+        'patientId': json['patientId'],
         'sampleCode': json['sampleCode'],
         'collectedAt': (new Date(json['collectedAt'])),
         'testTypes': json['testTypes'],
@@ -98,4 +99,3 @@ export function NewSampleToJSON(value?: NewSample | null): any {
         'testTypes': value.testTypes,
     };
 }
-

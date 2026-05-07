@@ -60,8 +60,9 @@ export class MglmSampleDraftForm {
         </label>
 
         <label>
-          Patient identifier
+          Patient identifier <span class="required-marker">*</span>
           <input
+            required
             value={this.workingDraft.patientId || ''}
             onInput={(ev: Event) => this.patchDraft({ patientId: (ev.target as HTMLInputElement).value })}
           />
