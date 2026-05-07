@@ -1,17 +1,33 @@
 import {
+  Configuration,
+  PatientReportsApi,
+  SampleMeasurementsApi,
+  SampleReportsApi,
+  SamplesApi,
+  ResponseError,
+} from '../api/sample-and-diagnosis-test';
+import type {
+  MeasurementValue as ApiMeasurementValue,
+  NewSample as ApiNewSample,
+  Sample as ApiSample,
+  SampleStatus as ApiSampleStatus,
+} from '../api/sample-and-diagnosis-test';
+import {
   DiagnosticReport,
   MeasurementValue,
   NewSampleDraft,
   Sample,
   SampleStatus,
-  createEmptyMeasurements,
-  createSampleCode,
   fromDateTimeInputValue,
+  getMeasurementDefinition,
 } from '../domain/sample';
 
 type Listener = (samples: Sample[]) => void;
 
-const now = () => new Date().toISOString();
+function normalizeBasePath(basePath?: string): string {
+  const value = (basePath || '/api').trim();
+  return value.length > 1 ? value.replace(/\/+$/, '') : value;
+}
 
 function cloneSamples(samples: Sample[]): Sample[] {
   return samples.map(sample => ({
@@ -22,122 +38,127 @@ function cloneSamples(samples: Sample[]): Sample[] {
   }));
 }
 
-function seedSamples(): Sample[] {
-  const createdAt = now();
-  return [
-    {
-      id: 'sample-001',
-      patientName: 'Juraj Prvy',
-      patientId: 'P-1001',
-      sampleCode: 'SMP-20260506-A1B2',
-      collectedAt: new Date('2026-05-06T08:20:00').toISOString(),
-      testTypes: ['crp', 'blood_count'],
-      status: 'collected',
-      measurements: [
-        { testTypeCode: 'crp', code: 'crp_value', value: 18, unit: 'mg/L', enteredByRole: 'technician' },
-        { testTypeCode: 'blood_count', code: 'wbc', value: '', unit: '10^9/L' },
-        { testTypeCode: 'blood_count', code: 'hemoglobin', value: '', unit: 'g/L' },
-      ],
-      createdAt,
-      updatedAt: createdAt,
-      createdBy: 'Lab technician',
-    },
-    {
-      id: 'sample-002',
-      patientName: 'Eva Novakova',
-      patientId: 'P-1002',
-      sampleCode: 'SMP-20260506-C3D4',
-      collectedAt: new Date('2026-05-06T09:05:00').toISOString(),
-      testTypes: ['glucose'],
-      status: 'in_diagnostics',
-      measurements: [
-        { testTypeCode: 'glucose', code: 'glucose_value', value: 6.1, unit: 'mmol/L', enteredByRole: 'technician' },
-        { testTypeCode: 'glucose', code: 'fasting', value: true, enteredByRole: 'technician' },
-      ],
-      createdAt,
-      updatedAt: createdAt,
-      createdBy: 'Lab technician',
-    },
-    {
-      id: 'sample-003',
-      patientName: 'Martin Kral',
-      patientId: 'P-1003',
-      sampleCode: 'SMP-20260506-E5F6',
-      collectedAt: new Date('2026-05-06T09:30:00').toISOString(),
-      testTypes: ['covid_antigen'],
-      status: 'report_draft',
-      measurements: [
-        { testTypeCode: 'covid_antigen', code: 'result', value: 'positive', enteredByRole: 'diagnostician' },
-      ],
-      report: {
-        id: 'report-003',
-        sampleId: 'sample-003',
-        patientId: 'P-1003',
-        summary: 'Antigen test is positive.',
-        conclusion: 'Findings are consistent with acute viral infection.',
-        recommendations: 'Repeat confirmation test if symptoms persist.',
-        createdAt,
-        updatedAt: createdAt,
-        author: 'Diagnostician',
-        status: 'draft',
-      },
-      createdAt,
-      updatedAt: createdAt,
-      createdBy: 'Lab technician',
-    },
-    {
-      id: 'sample-004',
-      patientName: 'Eva Novakova',
-      patientId: 'P-1002',
-      sampleCode: 'SMP-20260428-G7H8',
-      collectedAt: new Date('2026-04-28T10:10:00').toISOString(),
-      testTypes: ['glucose'],
-      status: 'finalized',
-      measurements: [
-        { testTypeCode: 'glucose', code: 'glucose_value', value: 5.4, unit: 'mmol/L', enteredByRole: 'diagnostician' },
-        { testTypeCode: 'glucose', code: 'fasting', value: true, enteredByRole: 'diagnostician' },
-      ],
-      report: {
-        id: 'report-004',
-        sampleId: 'sample-004',
-        patientId: 'P-1002',
-        summary: 'Glucose level within expected fasting range.',
-        conclusion: 'No diagnostic escalation required.',
-        createdAt,
-        updatedAt: createdAt,
-        finalizedAt: createdAt,
-        author: 'Diagnostician',
-        status: 'finalized',
-      },
-      createdAt,
-      updatedAt: createdAt,
-      createdBy: 'Lab technician',
-      finalizedBy: 'Diagnostician',
-    },
-    {
-      id: 'sample-005',
-      patientName: 'Tomas Biely',
-      patientId: 'P-1004',
-      sampleCode: 'SMP-20260506-I9J0',
-      collectedAt: new Date('2026-05-06T10:00:00').toISOString(),
-      testTypes: ['urine_chemical'],
-      status: 'tainted',
-      measurements: createEmptyMeasurements(['urine_chemical']),
-      createdAt,
-      updatedAt: createdAt,
-      createdBy: 'Lab technician',
-    },
-  ];
+function apiDate(value?: Date | string): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+}
+
+function fromApiMeasurement(value: ApiMeasurementValue): MeasurementValue {
+  const definition = getMeasurementDefinition(value.testTypeCode, value.code);
+  let parsed: string | number | boolean = value.value;
+
+  if (definition?.valueType === 'number' && value.value !== '') {
+    parsed = Number(value.value);
+  } else if (definition?.valueType === 'boolean') {
+    parsed = value.value === 'true' || value.value === '1';
+  }
+
+  return {
+    testTypeCode: value.testTypeCode,
+    code: value.code,
+    value: parsed,
+    unit: value.unit,
+    measuredAt: apiDate(value.measuredAt),
+    enteredByRole: value.enteredByRole,
+  };
+}
+
+function toApiMeasurement(value: MeasurementValue): ApiMeasurementValue {
+  return {
+    testTypeCode: value.testTypeCode,
+    code: value.code,
+    value: String(value.value),
+    unit: value.unit,
+    measuredAt: value.measuredAt ? new Date(value.measuredAt) : undefined,
+    enteredByRole: value.enteredByRole === 'technician' || value.enteredByRole === 'diagnostician'
+      ? value.enteredByRole
+      : undefined,
+  };
+}
+
+function fromApiReport(report: ApiSample['report']): DiagnosticReport | undefined {
+  if (!report) {
+    return undefined;
+  }
+
+  return {
+    ...report,
+    createdAt: apiDate(report.createdAt) || '',
+    updatedAt: apiDate(report.updatedAt) || '',
+    finalizedAt: apiDate(report.finalizedAt),
+  };
+}
+
+function fromApiSample(sample: ApiSample): Sample {
+  return {
+    id: sample.id,
+    patientName: sample.patientName,
+    patientId: sample.patientId,
+    sampleCode: sample.sampleCode,
+    collectedAt: apiDate(sample.collectedAt) || '',
+    testTypes: [...sample.testTypes],
+    status: sample.status as SampleStatus,
+    measurements: sample.measurements.map(fromApiMeasurement),
+    report: fromApiReport(sample.report),
+    createdAt: apiDate(sample.createdAt) || '',
+    updatedAt: apiDate(sample.updatedAt) || '',
+    createdBy: sample.createdBy,
+    finalizedBy: sample.finalizedBy,
+  };
+}
+
+function toApiNewSample(draft: NewSampleDraft): ApiNewSample {
+  return {
+    patientName: draft.patientName.trim(),
+    patientId: draft.patientId?.trim() || undefined,
+    sampleCode: draft.sampleCode.trim(),
+    collectedAt: new Date(fromDateTimeInputValue(draft.collectedAt)),
+    testTypes: [...draft.testTypes],
+  };
+}
+
+async function userFacingError(error: unknown): Promise<string> {
+  if (error instanceof ResponseError) {
+    try {
+      const body = await error.response.clone().json();
+      return body?.message || body?.error || `Request failed with status ${error.response.status}.`;
+    } catch {
+      return `Request failed with status ${error.response.status}.`;
+    }
+  }
+
+  return error instanceof Error ? error.message : 'Request failed.';
 }
 
 export class SampleStore {
-  private samples = seedSamples();
   private listeners: Listener[] = [];
-  private sequence = this.samples.length + 1;
+  private samples: Sample[] = [];
+  private configuration = new Configuration({ basePath: '/api' });
+  private samplesApi = new SamplesApi(this.configuration);
+  private measurementsApi = new SampleMeasurementsApi(this.configuration);
+  private reportsApi = new SampleReportsApi(this.configuration);
+  private patientReportsApi = new PatientReportsApi(this.configuration);
+
+  configure(basePath?: string): void {
+    const normalized = normalizeBasePath(basePath);
+    if (this.configuration.basePath === normalized) {
+      return;
+    }
+
+    this.configuration = new Configuration({ basePath: normalized });
+    this.samplesApi = new SamplesApi(this.configuration);
+    this.measurementsApi = new SampleMeasurementsApi(this.configuration);
+    this.reportsApi = new SampleReportsApi(this.configuration);
+    this.patientReportsApi = new PatientReportsApi(this.configuration);
+    this.refresh();
+  }
 
   subscribe(listener: Listener): () => void {
     this.listeners = [...this.listeners, listener];
     listener(this.listSamples());
+    this.refresh();
     return () => {
       this.listeners = this.listeners.filter(current => current !== listener);
     };
@@ -147,200 +168,103 @@ export class SampleStore {
     return cloneSamples(this.samples);
   }
 
-  getSample(id: string): Sample | undefined {
-    return cloneSamples(this.samples).find(sample => sample.id === id);
-  }
-
-  createSample(draft: NewSampleDraft): Sample {
-    const timestamp = now();
-    const sampleCode = draft.sampleCode.trim() || createSampleCode();
-    const sample: Sample = {
-      id: `sample-${String(this.sequence++).padStart(3, '0')}`,
-      patientName: draft.patientName.trim(),
-      patientId: draft.patientId?.trim() || undefined,
-      sampleCode,
-      collectedAt: fromDateTimeInputValue(draft.collectedAt),
-      testTypes: [...draft.testTypes],
-      status: 'draft',
-      measurements: draft.measurements.map(measurement => ({
-        ...measurement,
-        enteredByRole: undefined,
-        measuredAt: undefined,
-      })),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      createdBy: 'Lab technician',
-    };
-
-    this.samples = [sample, ...this.samples];
-    this.emit();
-    return { ...sample };
-  }
-
-  updateDraftSample(id: string, draft: NewSampleDraft): boolean {
-    let updated = false;
-    this.samples = this.samples.map(sample => {
-      if (sample.id !== id || sample.status !== 'draft') {
-        return sample;
+  async getSample(id: string): Promise<Sample | undefined> {
+    try {
+      const sample = fromApiSample(await this.samplesApi.getSample({ sampleId: id }));
+      this.upsertSample(sample);
+      return { ...sample };
+    } catch (error) {
+      if (error instanceof ResponseError && error.response.status === 404) {
+        this.samples = this.samples.filter(sample => sample.id !== id);
+        this.emit();
+        return undefined;
       }
-
-      updated = true;
-      return {
-        ...sample,
-        patientName: draft.patientName.trim(),
-        patientId: draft.patientId?.trim() || undefined,
-        sampleCode: draft.sampleCode.trim() || sample.sampleCode,
-        collectedAt: fromDateTimeInputValue(draft.collectedAt),
-        testTypes: [...draft.testTypes],
-        measurements: draft.measurements.map(measurement => ({
-          ...measurement,
-          enteredByRole: undefined,
-          measuredAt: undefined,
-        })),
-        updatedAt: now(),
-      };
-    });
-
-    if (updated) {
-      this.emit();
+      throw new Error(await userFacingError(error));
     }
-    return updated;
   }
 
-  publishSample(id: string): boolean {
-    let published = false;
-    this.samples = this.samples.map(sample => {
-      if (sample.id !== id || sample.status !== 'draft') {
-        return sample;
-      }
-
-      published = true;
-      return {
-        ...sample,
-        status: 'collected',
-        updatedAt: now(),
-      };
-    });
-
-    if (published) {
-      this.emit();
-    }
-    return published;
-  }
-
-  updateSampleStatus(id: string, status: SampleStatus): void {
-    this.samples = this.samples.map(sample =>
-      sample.id === id
-        ? {
-            ...sample,
-            status,
-            updatedAt: now(),
-          }
-        : sample,
+  async createSample(draft: NewSampleDraft): Promise<Sample> {
+    return this.saveReturnedSample(
+      this.samplesApi.createSample({ newSample: toApiNewSample(draft) }),
     );
-    this.emit();
   }
 
-  markTainted(id: string): void {
-    this.updateSampleStatus(id, 'tainted');
-  }
-
-  deleteSample(id: string): boolean {
-    const sample = this.samples.find(current => current.id === id);
-    if (!sample || sample.status === 'finalized') {
-      return false;
-    }
-    this.samples = this.samples.filter(current => current.id !== id);
-    this.emit();
+  async updateDraftSample(id: string, draft: NewSampleDraft): Promise<boolean> {
+    await this.saveReturnedSample(
+      this.samplesApi.updateSample({ sampleId: id, newSample: toApiNewSample(draft) }),
+    );
     return true;
   }
 
-  saveMeasurements(id: string, measurements: MeasurementValue[], role: 'technician' | 'diagnostician'): void {
-    this.samples = this.samples.map(sample =>
-      sample.id === id
-        ? {
-            ...sample,
-            status: sample.status === 'collected' && role === 'diagnostician' ? 'in_diagnostics' : sample.status,
-            measurements: measurements.map(measurement => ({
-              ...measurement,
-              enteredByRole: measurement.enteredByRole || role,
-              measuredAt: measurement.measuredAt || now(),
-            })),
-            updatedAt: now(),
-          }
-        : sample,
+  async publishSample(id: string): Promise<boolean> {
+    await this.saveReturnedSample(
+      this.samplesApi.updateSampleStatus({
+        sampleId: id,
+        sampleStatusUpdate: { status: 'collected' },
+      }),
     );
-    this.emit();
+    return true;
   }
 
-  saveReportDraft(id: string, reportData: Pick<DiagnosticReport, 'summary' | 'conclusion' | 'recommendations'>): void {
-    const timestamp = now();
-    this.samples = this.samples.map(sample => {
-      if (sample.id !== id || sample.status === 'finalized') {
-        return sample;
-      }
-
-      const report: DiagnosticReport = {
-        id: sample.report?.id || `report-${sample.id}`,
-        sampleId: sample.id,
-        patientId: sample.patientId,
-        summary: reportData.summary,
-        conclusion: reportData.conclusion,
-        recommendations: reportData.recommendations,
-        createdAt: sample.report?.createdAt || timestamp,
-        updatedAt: timestamp,
-        author: sample.report?.author || 'Diagnostician',
-        status: 'draft',
-      };
-
-      return {
-        ...sample,
-        status: 'report_draft',
-        report,
-        updatedAt: timestamp,
-      };
-    });
-    this.emit();
+  async markTainted(id: string): Promise<void> {
+    await this.updateSampleStatus(id, 'tainted');
   }
 
-  discardReport(id: string): void {
-    this.samples = this.samples.map(sample =>
-      sample.id === id && sample.status === 'report_draft'
-        ? {
-            ...sample,
-            status: 'in_diagnostics',
-            report: undefined,
-            updatedAt: now(),
-          }
-        : sample,
+  async updateSampleStatus(id: string, status: SampleStatus): Promise<void> {
+    await this.saveReturnedSample(
+      this.samplesApi.updateSampleStatus({
+        sampleId: id,
+        sampleStatusUpdate: { status: status as ApiSampleStatus },
+      }),
     );
-    this.emit();
   }
 
-  finalizeReport(id: string): boolean {
-    const timestamp = now();
-    let finalized = false;
-    this.samples = this.samples.map(sample => {
-      if (sample.id !== id || !sample.report || sample.status === 'finalized') {
-        return sample;
+  async deleteSample(id: string): Promise<boolean> {
+    try {
+      await this.samplesApi.deleteSample({ sampleId: id });
+      this.samples = this.samples.filter(sample => sample.id !== id);
+      this.emit();
+      return true;
+    } catch (error) {
+      if (error instanceof ResponseError && error.response.status === 409) {
+        return false;
       }
+      throw new Error(await userFacingError(error));
+    }
+  }
 
-      finalized = true;
-      return {
-        ...sample,
-        status: 'finalized',
-        finalizedBy: 'Diagnostician',
-        report: {
-          ...sample.report,
-          status: 'finalized',
-          finalizedAt: timestamp,
-          updatedAt: timestamp,
+  async saveMeasurements(id: string, measurements: MeasurementValue[], _role?: 'technician' | 'diagnostician'): Promise<void> {
+    await this.saveReturnedSample(
+      this.measurementsApi.saveSampleMeasurements({
+        sampleId: id,
+        measurementValuesUpdate: { measurements: measurements.map(toApiMeasurement) },
+      }),
+    );
+  }
+
+  async saveReportDraft(
+    id: string,
+    reportData: Pick<DiagnosticReport, 'summary' | 'conclusion' | 'recommendations'>,
+  ): Promise<void> {
+    await this.saveReturnedSample(
+      this.reportsApi.saveSampleReport({
+        sampleId: id,
+        reportDraft: {
+          summary: reportData.summary,
+          conclusion: reportData.conclusion,
+          recommendations: reportData.recommendations,
         },
-        updatedAt: timestamp,
-      };
-    });
-    this.emit();
-    return finalized;
+      }),
+    );
+  }
+
+  async discardReport(id: string): Promise<void> {
+    await this.saveReturnedSample(this.reportsApi.deleteSampleReport({ sampleId: id }));
+  }
+
+  async finalizeReport(id: string): Promise<boolean> {
+    await this.saveReturnedSample(this.reportsApi.finalizeSampleReport({ sampleId: id }));
+    return true;
   }
 
   previousReportsForPatient(patientId?: string, excludeSampleId?: string): Sample[] {
@@ -357,12 +281,65 @@ export class SampleStore {
       );
   }
 
+  async fetchReportsForPatient(patientId: string): Promise<Sample[]> {
+    if (!patientId.trim()) {
+      return [];
+    }
+
+    try {
+      const reports = (await this.patientReportsApi.getPatientReports({ patientId: patientId.trim() }))
+        .map(fromApiSample);
+      reports.forEach(report => this.upsertSample(report, false));
+      this.emit();
+      return reports;
+    } catch (error) {
+      if (error instanceof ResponseError && error.response.status === 404) {
+        return [];
+      }
+      throw new Error(await userFacingError(error));
+    }
+  }
+
   finalizedPatientIds(): string[] {
     return Array.from(new Set(
       this.samples
         .filter(sample => sample.status === 'finalized' && sample.report && sample.patientId)
         .map(sample => sample.patientId),
     )).sort();
+  }
+
+  async refresh(): Promise<void> {
+    try {
+      const samples = await this.samplesApi.getSamples({ includeTainted: true });
+      this.samples = samples.map(fromApiSample);
+      this.emit();
+    } catch (error) {
+      console.error('Failed to load samples from backend', error);
+    }
+  }
+
+  private async saveReturnedSample(request: Promise<ApiSample>): Promise<Sample> {
+    try {
+      const sample = fromApiSample(await request);
+      this.upsertSample(sample);
+      return sample;
+    } catch (error) {
+      throw new Error(await userFacingError(error));
+    }
+  }
+
+  private upsertSample(sample: Sample, emit = true): void {
+    const next = cloneSamples(this.samples);
+    const index = next.findIndex(current => current.id === sample.id);
+    if (index === -1) {
+      this.samples = [sample, ...next];
+    } else {
+      next[index] = sample;
+      this.samples = next;
+    }
+    if (emit) {
+      this.emit();
+    }
   }
 
   private emit(): void {

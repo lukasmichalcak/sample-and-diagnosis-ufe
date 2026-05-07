@@ -1,5 +1,6 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
 import { UserRole } from '../../domain/sample';
+import { sampleStore } from '../../services/sample-store';
 
 @Component({
   tag: 'mglm-sample-and-diagnosis-test-app',
@@ -12,6 +13,10 @@ export class MglmSampleAndDiagnosisTestApp {
   @Prop() sampleAndDiagnosisId: string;
 
   @State() private activeRole: UserRole = 'technician';
+
+  componentWillLoad() {
+    sampleStore.configure(this.apiBase);
+  }
 
   render() {
     return (

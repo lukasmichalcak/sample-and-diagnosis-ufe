@@ -167,21 +167,29 @@ export class MglmTechnicianView {
     this.newSample = createNewSampleDraft();
   }
 
-  private createSample(draft: NewSampleDraft): void {
+  private async createSample(draft: NewSampleDraft): Promise<void> {
     if (!this.isValidDraft(draft)) {
       return;
     }
-    sampleStore.createSample(draft);
-    this.newSample = createNewSampleDraft();
-    this.createExpanded = false;
+    try {
+      await sampleStore.createSample(draft);
+      this.newSample = createNewSampleDraft();
+      this.createExpanded = false;
+    } catch (error) {
+      this.showError(error);
+    }
   }
 
-  private saveDraftEdits(sample: Sample, draft: NewSampleDraft): void {
+  private async saveDraftEdits(sample: Sample, draft: NewSampleDraft): Promise<void> {
     if (!this.isValidDraft(draft)) {
       return;
     }
-    sampleStore.updateDraftSample(sample.id, draft);
-    this.cancelDraftEdit();
+    try {
+      await sampleStore.updateDraftSample(sample.id, draft);
+      this.cancelDraftEdit();
+    } catch (error) {
+      this.showError(error);
+    }
   }
 
   private isValidDraft(draft: NewSampleDraft): boolean {
@@ -225,25 +233,41 @@ export class MglmTechnicianView {
     };
   }
 
-  private confirmPublishSample(sample: Sample): void {
+  private async confirmPublishSample(sample: Sample): Promise<void> {
     if (window.confirm(`Save sample ${sample.sampleCode} for diagnostics? The technician will no longer be able to edit it.`)) {
-      sampleStore.publishSample(sample.id);
-      this.cancelDraftEdit();
+      try {
+        await sampleStore.publishSample(sample.id);
+        this.cancelDraftEdit();
+      } catch (error) {
+        this.showError(error);
+      }
     }
   }
 
-  private confirmMarkTainted(sample: Sample): void {
+  private async confirmMarkTainted(sample: Sample): Promise<void> {
     if (window.confirm(`Mark sample ${sample.sampleCode} as tainted?`)) {
-      sampleStore.markTainted(sample.id);
+      try {
+        await sampleStore.markTainted(sample.id);
+      } catch (error) {
+        this.showError(error);
+      }
     }
   }
 
-  private confirmDeleteSample(sample: Sample): void {
+  private async confirmDeleteSample(sample: Sample): Promise<void> {
     if (!window.confirm(`Delete sample ${sample.sampleCode}? This cannot be undone in the local prototype.`)) {
       return;
     }
-    if (!sampleStore.deleteSample(sample.id)) {
-      window.alert('Finalized samples cannot be deleted.');
+    try {
+      if (!await sampleStore.deleteSample(sample.id)) {
+        window.alert('Finalized samples cannot be deleted.');
+      }
+    } catch (error) {
+      this.showError(error);
     }
+  }
+
+  private showError(error: unknown): void {
+    window.alert(error instanceof Error ? error.message : 'Backend request failed.');
   }
 }

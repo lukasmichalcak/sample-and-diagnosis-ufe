@@ -229,33 +229,45 @@ export class MglmDiagnosticianView {
     };
   }
 
-  private saveDiagnosticMeasurements(sample: Sample): void {
+  private async saveDiagnosticMeasurements(sample: Sample): Promise<void> {
     if (!areRequiredMeasurementsComplete(this.measurementDraft)) {
       window.alert('Complete all required measured values before saving.');
       return;
     }
-    sampleStore.saveMeasurements(sample.id, this.measurementDraft, 'diagnostician');
+    try {
+      await sampleStore.saveMeasurements(sample.id, this.measurementDraft, 'diagnostician');
+    } catch (error) {
+      this.showError(error);
+    }
   }
 
-  private saveReportDraft(sample: Sample): void {
+  private async saveReportDraft(sample: Sample): Promise<void> {
     if (!this.reportDraft.summary.trim() || !this.reportDraft.conclusion.trim()) {
       window.alert('Summary and conclusion are required before saving a preliminary report.');
       return;
     }
-    sampleStore.saveReportDraft(sample.id, this.reportDraft);
+    try {
+      await sampleStore.saveReportDraft(sample.id, this.reportDraft);
+    } catch (error) {
+      this.showError(error);
+    }
   }
 
-  private confirmDiscardReport(sample: Sample): void {
+  private async confirmDiscardReport(sample: Sample): Promise<void> {
     if (window.confirm(`Discard preliminary report for sample ${sample.sampleCode}?`)) {
-      sampleStore.discardReport(sample.id);
-      const updatedSample = sampleStore.getSample(sample.id);
-      if (updatedSample) {
-        this.selectDiagnosticSample(updatedSample);
+      try {
+        await sampleStore.discardReport(sample.id);
+        const updatedSample = await sampleStore.getSample(sample.id);
+        if (updatedSample) {
+          this.selectDiagnosticSample(updatedSample);
+        }
+      } catch (error) {
+        this.showError(error);
       }
     }
   }
 
-  private confirmFinalizeReport(sample: Sample): void {
+  private async confirmFinalizeReport(sample: Sample): Promise<void> {
     if (!areRequiredMeasurementsComplete(this.measurementDraft)) {
       window.alert('Complete all required measured values before finalizing.');
       return;
@@ -267,12 +279,21 @@ export class MglmDiagnosticianView {
     }
 
     if (!sample.report) {
-      sampleStore.saveReportDraft(sample.id, this.reportDraft);
+      try {
+        await sampleStore.saveReportDraft(sample.id, this.reportDraft);
+      } catch (error) {
+        this.showError(error);
+        return;
+      }
     }
 
     if (window.confirm(`Finalize report for sample ${sample.sampleCode}? Finalized reports cannot be deleted.`)) {
-      sampleStore.finalizeReport(sample.id);
-      this.selectedSampleId = undefined;
+      try {
+        await sampleStore.finalizeReport(sample.id);
+        this.selectedSampleId = undefined;
+      } catch (error) {
+        this.showError(error);
+      }
     }
   }
 
@@ -289,5 +310,9 @@ export class MglmDiagnosticianView {
       }));
 
     return JSON.stringify(normalize(sample.measurements)) === JSON.stringify(normalize(this.measurementDraft));
+  }
+
+  private showError(error: unknown): void {
+    window.alert(error instanceof Error ? error.message : 'Backend request failed.');
   }
 }
