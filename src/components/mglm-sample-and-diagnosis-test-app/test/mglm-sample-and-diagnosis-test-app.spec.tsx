@@ -193,7 +193,7 @@ describe('mglm-sample-and-diagnosis-test-app', () => {
     await page.waitForChanges();
     expect(page.root.shadowRoot.querySelector('md-dialog')).toBeNull();
 
-    const confirmPromise = showAppConfirm('Delete sample SMP-TEST-001? This cannot be undone in the local prototype.');
+    const confirmPromise = showAppConfirm('Delete sample SMP-TEST-001? This cannot be undone unless you are an admin (in MongoDB).');
     await page.waitForChanges();
 
     dialog = page.root.shadowRoot.querySelector('md-dialog');

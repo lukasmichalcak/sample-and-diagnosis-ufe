@@ -263,7 +263,7 @@ export class MglmTechnicianView {
   }
 
   private async confirmDeleteSample(sample: Sample): Promise<void> {
-    if (!await showAppConfirm(`Delete sample ${sample.sampleCode}? This cannot be undone in the local prototype.`)) {
+    if (!await showAppConfirm(`Delete sample ${sample.sampleCode}? This cannot be undone unless you are an admin (in MongoDB).`)) {
       return;
     }
     try {
