@@ -60,7 +60,10 @@ export class MglmDiagnosticianView {
         <section class="panel">
           <div class="section-header">
             <div>
-              <h2>Diagnostics queue</h2>
+              <div class="section-title">
+                <md-icon>pending_actions</md-icon>
+                <h2>Diagnostics queue</h2>
+              </div>
               <p>Collected means not started; in diagnostics means measured values were saved.</p>
             </div>
           </div>
@@ -101,7 +104,10 @@ export class MglmDiagnosticianView {
       <div class="diagnostic-editor">
         <div class="section-header">
           <div>
-            <h2>{sample.sampleCode}</h2>
+            <div class="section-title">
+              <md-icon>biotech</md-icon>
+              <h2>{sample.sampleCode}</h2>
+            </div>
             <p>{sample.patientName} {sample.patientId ? `(${sample.patientId})` : ''}</p>
           </div>
           <span class={`status status-${sample.status}`}>{SAMPLE_STATUS_LABELS[sample.status]}</span>
@@ -160,7 +166,10 @@ export class MglmDiagnosticianView {
   private renderPreviousReports(previousReports: Sample[], patientId?: string) {
     return (
       <section>
-        <h3>Previous finalized reports</h3>
+        <div class="section-title compact-title">
+          <md-icon>history</md-icon>
+          <h3>Previous finalized reports</h3>
+        </div>
         <p class="helper-text">
           Matching uses patient identifier{patientId ? ` ${patientId}` : ''}. Patient names are not used as identifiers.
         </p>
@@ -184,7 +193,10 @@ export class MglmDiagnosticianView {
     const reports = sampleStore.previousReportsForPatient(this.reportQueryPatientId || undefined);
     return (
       <section class="query-box">
-        <h3>Finalized report query</h3>
+        <div class="section-title compact-title">
+          <md-icon>manage_search</md-icon>
+          <h3>Finalized report query</h3>
+        </div>
         <p class="helper-text">Search by patient identifier. Names are display text only.</p>
         <label>
           Patient identifier

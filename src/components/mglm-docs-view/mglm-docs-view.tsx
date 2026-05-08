@@ -35,7 +35,10 @@ export class MglmDocsView {
         <section class="panel">
           <div class="section-header">
             <div>
-              <h2>Documentation</h2>
+              <div class="section-title">
+                <md-icon>folder_open</md-icon>
+                <h2>Documentation</h2>
+              </div>
               <p>Finalized reports grouped by patient identifier.</p>
             </div>
           </div>
@@ -78,7 +81,10 @@ export class MglmDocsView {
       <section class="docs-detail">
         <div class="section-header">
           <div>
-            <h2>{patientId}</h2>
+            <div class="section-title">
+              <md-icon>badge</md-icon>
+              <h2>{patientId}</h2>
+            </div>
             <p>Read-only finalized report history.</p>
           </div>
         </div>

@@ -23,7 +23,10 @@ export class MglmReportEditor {
   render() {
     return (
       <section class="report-section">
-        <h3>Diagnostic report</h3>
+        <div class="section-title compact-title">
+          <md-icon>clinical_notes</md-icon>
+          <h3>Diagnostic report</h3>
+        </div>
         <label>
           Summary <span class="required-marker">*</span>
           <textarea
@@ -55,6 +58,7 @@ export class MglmReportEditor {
             Discard preliminary
           </md-outlined-button>
           <md-filled-tonal-button onClick={() => this.reportPreliminarySaved.emit()}>
+            <md-icon slot="icon">draft</md-icon>
             Save preliminary
           </md-filled-tonal-button>
           <md-filled-button onClick={() => this.reportFinalized.emit()}>

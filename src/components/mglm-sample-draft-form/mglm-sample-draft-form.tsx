@@ -42,7 +42,10 @@ export class MglmSampleDraftForm {
       <form class="form" onSubmit={(ev: Event) => this.handleSubmit(ev)}>
         <div class="section-header compact">
           <div>
-            <h2>{this.formTitle}</h2>
+            <div class="section-title">
+              <md-icon>assignment_add</md-icon>
+              <h2>{this.formTitle}</h2>
+            </div>
             <p>{this.description}</p>
           </div>
           <button type="button" class="icon-command" title="Close" onClick={() => this.sampleDraftCancel.emit()}>
@@ -118,6 +121,7 @@ export class MglmSampleDraftForm {
 
         <div class="actions">
           <md-outlined-button type="button" onClick={() => this.sampleDraftCancel.emit()}>
+            <md-icon slot="icon">close</md-icon>
             {this.cancelLabel}
           </md-outlined-button>
           <md-filled-button type="submit">

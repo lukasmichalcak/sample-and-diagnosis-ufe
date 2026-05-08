@@ -59,7 +59,10 @@ export class MglmTechnicianView {
         <section class="panel">
           <div class="section-header">
             <div>
-              <h2>Technician samples</h2>
+              <div class="section-title">
+                <md-icon>science</md-icon>
+                <h2>Technician samples</h2>
+              </div>
               <p>Drafts can be edited. Saved samples move to the diagnostics queue.</p>
             </div>
             {!this.createExpanded

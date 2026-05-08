@@ -34,7 +34,7 @@ export class MglmSampleAndDiagnosisTestApp {
       <header class="top-bar">
         <div>
           <h1>Sample and Diagnosis</h1>
-          <p>Local UFE workflow prototype</p>
+          <p>A unified place for Lab Technicians and Diagnosticians to conduct their work</p>
         </div>
         <nav aria-label="Role navigation">
           <button
