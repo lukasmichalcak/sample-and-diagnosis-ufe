@@ -510,6 +510,34 @@ md-divider {
   font-weight: 700;
 }
 
+.app-dialog {
+  --md-dialog-container-color: #ffffff;
+  --md-dialog-headline-color: var(--blue-900);
+  --md-dialog-supporting-text-color: #3f4752;
+}
+
+.dialog-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dialog-title md-icon {
+  color: var(--blue-700);
+}
+
+.dialog-message {
+  max-width: 30rem;
+  color: #3f4752;
+  line-height: 1.45;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 @media (max-width: 760px) {
   .section-header,
   .sample-card-main {

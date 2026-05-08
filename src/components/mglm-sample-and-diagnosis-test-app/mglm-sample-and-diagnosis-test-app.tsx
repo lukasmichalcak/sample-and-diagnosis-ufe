@@ -1,5 +1,6 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
 import { UserRole } from '../../domain/sample';
+import { AppDialogRequest, closeAppDialog, subscribeAppDialog } from '../../services/app-dialog';
 import { sampleStore } from '../../services/sample-store';
 
 @Component({
@@ -13,9 +14,19 @@ export class MglmSampleAndDiagnosisTestApp {
   @Prop() sampleAndDiagnosisId: string;
 
   @State() private activeRole: UserRole = 'technician';
+  @State() private dialogRequest?: AppDialogRequest;
+
+  private unsubscribeDialog?: () => void;
 
   componentWillLoad() {
     sampleStore.configure(this.apiBase);
+    this.unsubscribeDialog = subscribeAppDialog(request => {
+      this.dialogRequest = request ? { ...request } : undefined;
+    });
+  }
+
+  disconnectedCallback() {
+    this.unsubscribeDialog?.();
   }
 
   render() {
@@ -24,6 +35,7 @@ export class MglmSampleAndDiagnosisTestApp {
         <div class="app-shell">
           {this.renderTopNav()}
           <main>{this.renderActiveView()}</main>
+          {this.renderAppDialog()}
         </div>
       </Host>
     );
@@ -76,5 +88,42 @@ export class MglmSampleAndDiagnosisTestApp {
     }
 
     return <mglm-technician-view></mglm-technician-view>;
+  }
+
+  private renderAppDialog() {
+    const dialog = this.dialogRequest;
+    if (!dialog) {
+      return undefined;
+    }
+
+    return (
+      <md-dialog
+        class="app-dialog"
+        open
+        type={dialog.kind === 'alert' ? 'alert' : undefined}
+        onCancel={(ev: Event) => {
+          ev.preventDefault();
+          closeAppDialog(dialog.id, false);
+        }}
+      >
+        <div slot="headline" class="dialog-title">
+          <md-icon>{dialog.icon}</md-icon>
+          <span>{dialog.title}</span>
+        </div>
+        <div slot="content" class="dialog-message">{dialog.message}</div>
+        <div slot="actions" class="dialog-actions">
+          {dialog.cancelLabel
+            ? (
+              <md-outlined-button onClick={() => closeAppDialog(dialog.id, false)}>
+                {dialog.cancelLabel}
+              </md-outlined-button>
+            )
+            : undefined}
+          <md-filled-button autofocus onClick={() => closeAppDialog(dialog.id, true)}>
+            {dialog.confirmLabel}
+          </md-filled-button>
+        </div>
+      </md-dialog>
+    );
   }
 }

@@ -8,6 +8,7 @@ import {
   formatDateTime,
   getTestTypeName,
 } from '../../domain/sample';
+import { showAppAlert, showAppConfirm } from '../../services/app-dialog';
 import { sampleStore } from '../../services/sample-store';
 
 type ReportDraft = Pick<DiagnosticReport, 'summary' | 'conclusion' | 'recommendations'>;
@@ -243,7 +244,7 @@ export class MglmDiagnosticianView {
 
   private async saveDiagnosticMeasurements(sample: Sample): Promise<void> {
     if (!areRequiredMeasurementsComplete(this.measurementDraft)) {
-      window.alert('Complete all required measured values before saving.');
+      await showAppAlert('Complete all required measured values before saving.');
       return;
     }
     try {
@@ -255,7 +256,7 @@ export class MglmDiagnosticianView {
 
   private async saveReportDraft(sample: Sample): Promise<void> {
     if (!this.reportDraft.summary.trim() || !this.reportDraft.conclusion.trim()) {
-      window.alert('Summary and conclusion are required before saving a preliminary report.');
+      await showAppAlert('Summary and conclusion are required before saving a preliminary report.');
       return;
     }
     try {
@@ -266,7 +267,7 @@ export class MglmDiagnosticianView {
   }
 
   private async confirmDiscardReport(sample: Sample): Promise<void> {
-    if (window.confirm(`Discard preliminary report for sample ${sample.sampleCode}?`)) {
+    if (await showAppConfirm(`Discard preliminary report for sample ${sample.sampleCode}?`)) {
       try {
         await sampleStore.discardReport(sample.id);
         const updatedSample = await sampleStore.getSample(sample.id);
@@ -281,12 +282,12 @@ export class MglmDiagnosticianView {
 
   private async confirmFinalizeReport(sample: Sample): Promise<void> {
     if (!areRequiredMeasurementsComplete(this.measurementDraft)) {
-      window.alert('Complete all required measured values before finalizing.');
+      await showAppAlert('Complete all required measured values before finalizing.');
       return;
     }
 
     if (!sample.report && (!this.reportDraft.summary.trim() || !this.reportDraft.conclusion.trim())) {
-      window.alert('Create a preliminary report before finalizing.');
+      await showAppAlert('Create a preliminary report before finalizing.');
       return;
     }
 
@@ -299,7 +300,7 @@ export class MglmDiagnosticianView {
       }
     }
 
-    if (window.confirm(`Finalize report for sample ${sample.sampleCode}? Finalized reports cannot be deleted.`)) {
+    if (await showAppConfirm(`Finalize report for sample ${sample.sampleCode}? Finalized reports cannot be deleted.`)) {
       try {
         await sampleStore.finalizeReport(sample.id);
         this.selectedSampleId = undefined;
@@ -325,6 +326,6 @@ export class MglmDiagnosticianView {
   }
 
   private showError(error: unknown): void {
-    window.alert(error instanceof Error ? error.message : 'Backend request failed.');
+    showAppAlert(error instanceof Error ? error.message : 'Backend request failed.', 'Request failed');
   }
 }

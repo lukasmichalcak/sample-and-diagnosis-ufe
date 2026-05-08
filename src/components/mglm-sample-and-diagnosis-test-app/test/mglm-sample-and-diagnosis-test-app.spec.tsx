@@ -6,6 +6,7 @@ import { MglmReportEditor } from '../../mglm-report-editor/mglm-report-editor';
 import { MglmSampleDraftForm } from '../../mglm-sample-draft-form/mglm-sample-draft-form';
 import { MglmTechnicianView } from '../../mglm-technician-view/mglm-technician-view';
 import { MglmSampleAndDiagnosisTestApp } from '../mglm-sample-and-diagnosis-test-app';
+import { showAppAlert, showAppConfirm } from '../../../services/app-dialog';
 
 const workflowComponents = [
   MglmSampleAndDiagnosisTestApp,
@@ -171,5 +172,33 @@ describe('mglm-sample-and-diagnosis-test-app', () => {
     expect(activeRole?.textContent).toEqual('Docs');
     expect(heading?.textContent).toEqual('Documentation');
     expect(patientTiles.length).toBeGreaterThan(0);
+  });
+
+  it('renders the shared app dialog for alerts and confirmations', async () => {
+    const page = await newSpecPage({
+      components: workflowComponents,
+      html: testAppHtml,
+    });
+
+    await flushBackendRefresh(page);
+
+    const alertPromise = showAppAlert('Patient name is required.');
+    await page.waitForChanges();
+
+    let dialog = page.root.shadowRoot.querySelector('md-dialog');
+    expect(dialog?.querySelector('[slot="headline"]')?.textContent).toContain('Notice');
+    expect(dialog?.querySelector('[slot="content"]')?.textContent).toEqual('Patient name is required.');
+    (dialog?.querySelector('md-filled-button') as HTMLElement).click();
+    await alertPromise;
+    await page.waitForChanges();
+    expect(page.root.shadowRoot.querySelector('md-dialog')).toBeNull();
+
+    const confirmPromise = showAppConfirm('Delete sample SMP-TEST-001? This cannot be undone in the local prototype.');
+    await page.waitForChanges();
+
+    dialog = page.root.shadowRoot.querySelector('md-dialog');
+    expect(dialog?.querySelector('[slot="headline"]')?.textContent).toContain('Confirm');
+    (dialog?.querySelector('md-outlined-button') as HTMLElement).click();
+    await expect(confirmPromise).resolves.toBe(false);
   });
 });

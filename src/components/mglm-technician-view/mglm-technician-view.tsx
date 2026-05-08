@@ -8,6 +8,7 @@ import {
   getTestTypeName,
   toDateTimeInputValue,
 } from '../../domain/sample';
+import { showAppAlert, showAppConfirm } from '../../services/app-dialog';
 import { sampleStore } from '../../services/sample-store';
 
 @Component({
@@ -171,7 +172,7 @@ export class MglmTechnicianView {
   }
 
   private async createSample(draft: NewSampleDraft): Promise<void> {
-    if (!this.isValidDraft(draft)) {
+    if (!await this.isValidDraft(draft)) {
       return;
     }
     try {
@@ -184,7 +185,7 @@ export class MglmTechnicianView {
   }
 
   private async saveDraftEdits(sample: Sample, draft: NewSampleDraft): Promise<void> {
-    if (!this.isValidDraft(draft)) {
+    if (!await this.isValidDraft(draft)) {
       return;
     }
     try {
@@ -195,21 +196,21 @@ export class MglmTechnicianView {
     }
   }
 
-  private isValidDraft(draft: NewSampleDraft): boolean {
+  private async isValidDraft(draft: NewSampleDraft): Promise<boolean> {
     if (!draft.patientName.trim()) {
-      window.alert('Patient name is required.');
+      await showAppAlert('Patient name is required.');
       return false;
     }
     if (!draft.patientId?.trim()) {
-      window.alert('Patient identifier is required.');
+      await showAppAlert('Patient identifier is required.');
       return false;
     }
     if (!draft.sampleCode.trim()) {
-      window.alert('Sample code is required.');
+      await showAppAlert('Sample code is required.');
       return false;
     }
     if (draft.testTypes.length === 0) {
-      window.alert('Select at least one test type.');
+      await showAppAlert('Select at least one test type.');
       return false;
     }
     return true;
@@ -241,7 +242,7 @@ export class MglmTechnicianView {
   }
 
   private async confirmPublishSample(sample: Sample): Promise<void> {
-    if (window.confirm(`Save sample ${sample.sampleCode} for diagnostics? The technician will no longer be able to edit it.`)) {
+    if (await showAppConfirm(`Save sample ${sample.sampleCode} for diagnostics? The technician will no longer be able to edit it.`)) {
       try {
         await sampleStore.publishSample(sample.id);
         this.cancelDraftEdit();
@@ -252,7 +253,7 @@ export class MglmTechnicianView {
   }
 
   private async confirmMarkTainted(sample: Sample): Promise<void> {
-    if (window.confirm(`Mark sample ${sample.sampleCode} as tainted?`)) {
+    if (await showAppConfirm(`Mark sample ${sample.sampleCode} as tainted?`)) {
       try {
         await sampleStore.markTainted(sample.id);
       } catch (error) {
@@ -262,12 +263,12 @@ export class MglmTechnicianView {
   }
 
   private async confirmDeleteSample(sample: Sample): Promise<void> {
-    if (!window.confirm(`Delete sample ${sample.sampleCode}? This cannot be undone in the local prototype.`)) {
+    if (!await showAppConfirm(`Delete sample ${sample.sampleCode}? This cannot be undone in the local prototype.`)) {
       return;
     }
     try {
       if (!await sampleStore.deleteSample(sample.id)) {
-        window.alert('Finalized samples cannot be deleted.');
+        await showAppAlert('Finalized samples cannot be deleted.');
       }
     } catch (error) {
       this.showError(error);
@@ -275,6 +276,6 @@ export class MglmTechnicianView {
   }
 
   private showError(error: unknown): void {
-    window.alert(error instanceof Error ? error.message : 'Backend request failed.');
+    showAppAlert(error instanceof Error ? error.message : 'Backend request failed.', 'Request failed');
   }
 }
